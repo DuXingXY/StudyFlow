@@ -1,5 +1,7 @@
 # StudyFlow · 学程 —— 大学生学习与项目管理平台
 
+[![CI](https://github.com/DuXingXY/StudyFlow/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/DuXingXY/StudyFlow/actions/workflows/ci.yml)
+
 > 面向大学生的 **“目标制定 → 项目规划 → 任务执行 → 进度统计 → 周期复盘”** 全链路个人学习与工程实践管理平台。  
 > **第四届全国大学生职业规划大赛（成长赛道）** 软件开发工程师方向代表性工程实践项目。
 
@@ -40,7 +42,7 @@
 ## 4. 快速启动与运行指南（对应 `AC-13`）
 
 ### 4.1 环境要求
-- Node.js `>= 18`（推荐 `v20+` / `v24+`）
+- Node.js `>= 22`（推荐 `24 LTS`；锁文件中的 Supabase 客户端要求 Node.js 22 或以上）
 
 ### 4.2 安装与本地启动
 ```bash
@@ -57,12 +59,16 @@ npm run dev
 
 ### 4.3 运行自动化验收测试与生产构建
 ```bash
-# 运行 AC-01 ~ AC-11 自动化验收测试套件
-npm test
+# 运行现有 8 项核心数据层验收测试
+npm test -- --run
 
 # 执行 TypeScript 类型检查与生产环境打包
 npm run build
 ```
+
+GitHub Actions 在每次推送、Pull Request 或手动触发时，使用 Node.js 24 依次执行 `npm ci`、`npm test -- --run` 与 `npm run build`。流程见 [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)，运行结果见 [GitHub Actions](https://github.com/DuXingXY/StudyFlow/actions)。
+
+现有自动化测试覆盖本地数据层的认证、目标与项目关联、删除保护、逾期与进度计算、周复盘防重、用户隔离和空输入校验；浏览器路由、刷新持久化、390px 移动端交互及真实 Supabase RLS 仍需按 [`docs/05-ACCEPTANCE.md`](./docs/05-ACCEPTANCE.md) 的对应步骤验收。
 
 ### 4.4 （可选）连接真实 Supabase 云端数据库
 1. 在 Supabase 控制台新建项目，打开 SQL Editor 执行 [`supabase/migrations/001_init_studyflow.sql`](./supabase/migrations/001_init_studyflow.sql)；
