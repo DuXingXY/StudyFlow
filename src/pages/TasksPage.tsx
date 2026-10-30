@@ -26,21 +26,24 @@ type TaskViewFilter = 'all' | 'today' | 'overdue' | 'todo' | 'doing' | 'done';
 
 const priorityMeta: Record<
   TaskPriority,
-  { label: string; badgeClass: string; weight: number }
+  { label: string; code: string; badgeClass: string; weight: number }
 > = {
   high: {
     label: '高优先级',
-    badgeClass: 'bg-red-50 text-red-700 border-red-200',
+    code: 'P0-HIGH',
+    badgeClass: 'bg-[#E61919] text-white border-[#E61919]',
     weight: 3,
   },
   medium: {
     label: '中优先级',
-    badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
+    code: 'P1-MED',
+    badgeClass: 'bg-[#0A0A0A] text-white border-[#0A0A0A]',
     weight: 2,
   },
   low: {
     label: '低优先级',
-    badgeClass: 'bg-slate-100 text-slate-600 border-slate-200',
+    code: 'P2-LOW',
+    badgeClass: 'bg-[#F6F5F2] text-[#525252] border-[#0A0A0A]',
     weight: 1,
   },
 };
@@ -172,16 +175,16 @@ export const TasksPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      {/* Swiss Header */}
+      <div className="bg-white border-2 border-[#0A0A0A] p-6 shadow-[4px_4px_0px_#0A0A0A] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-teal-700 text-white flex items-center justify-center shadow-xs shrink-0">
-              <CheckSquare className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <span>任务执行中心 (Tasks)</span>
+          <div className="flex items-center gap-2 text-[11px] font-mono-swiss font-bold uppercase tracking-[0.2em] text-[#E61919]">
+            <span>04 // TASK EXECUTION MATRIX</span>
+          </div>
+          <h1 className="text-xl sm:text-2xl font-black text-[#0A0A0A] mt-1 tracking-tight">
+            任务执行中心 (Tasks)
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+          <p className="text-xs sm:text-sm text-[#525252] mt-1 font-medium">
             统一管理项目子任务与日常独立待办，记录计划日期与截止期，自动预警逾期任务（AC-04 / AC-05）。
           </p>
         </div>
@@ -189,40 +192,40 @@ export const TasksPage: React.FC = () => {
         <button
           type="button"
           onClick={openCreateModal}
-          className="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold shadow-sm transition-all cursor-pointer shrink-0"
+          className="swiss-btn-accent min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider cursor-pointer shrink-0"
         >
           <Plus className="w-4 h-4" aria-hidden="true" />
           <span>新增任务</span>
         </button>
       </div>
 
-      {/* Multi-dimensional Bento Filter Bar */}
-      <div className="bento-card p-4 space-y-3.5">
+      {/* Multi-dimensional Swiss Filter Bar */}
+      <div className="bg-white border-2 border-[#0A0A0A] p-4 space-y-3.5">
         {/* View Tabs */}
         <div className="flex flex-wrap items-center gap-1.5">
           {(
             [
-              { key: 'all', label: `全部 (${tasks.length})` },
+              { key: 'all', label: `ALL / 全部 (${tasks.length})` },
               {
                 key: 'today',
-                label: `今日与逾期 (${tasks.filter((t) => isTaskTodayOrOverdue(t, todayStr)).length})`,
+                label: `TODAY / 今日与逾期 (${tasks.filter((t) => isTaskTodayOrOverdue(t, todayStr)).length})`,
               },
               {
                 key: 'overdue',
-                label: `已逾期 (${overdueCount})`,
+                label: `OVERDUE / 已逾期 (${overdueCount})`,
                 danger: overdueCount > 0,
               },
               {
                 key: 'todo',
-                label: `待办 (${tasks.filter((t) => t.status === 'todo').length})`,
+                label: `TODO / 待办 (${tasks.filter((t) => t.status === 'todo').length})`,
               },
               {
                 key: 'doing',
-                label: `进行中 (${tasks.filter((t) => t.status === 'doing').length})`,
+                label: `DOING / 进行中 (${tasks.filter((t) => t.status === 'doing').length})`,
               },
               {
                 key: 'done',
-                label: `已完成 (${tasks.filter((t) => t.status === 'done').length})`,
+                label: `DONE / 已完成 (${tasks.filter((t) => t.status === 'done').length})`,
               },
             ] as Array<{
               key: TaskViewFilter;
@@ -234,14 +237,14 @@ export const TasksPage: React.FC = () => {
               key={tab.key}
               type="button"
               onClick={() => setViewFilter(tab.key)}
-              className={`min-h-[38px] px-3.5 py-1.5 rounded-xl text-xs font-bold transition-colors cursor-pointer ${
+              className={`min-h-[38px] px-3.5 py-1.5 text-xs font-mono-swiss font-bold border transition-colors cursor-pointer ${
                 viewFilter === tab.key
                   ? tab.danger
-                    ? 'bg-red-600 text-white shadow-xs'
-                    : 'bg-teal-700 text-white shadow-xs'
+                    ? 'bg-[#E61919] text-white border-[#0A0A0A]'
+                    : 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
                   : tab.danger
-                  ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200'
-                  : 'text-slate-600 hover:bg-teal-50/80 hover:text-teal-900'
+                  ? 'bg-[#FFF5F5] text-[#E61919] border-[#E61919] hover:bg-[#E61919] hover:text-white'
+                  : 'bg-[#F6F5F2] text-[#0A0A0A] border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
               }`}
             >
               {tab.label}
@@ -250,10 +253,10 @@ export const TasksPage: React.FC = () => {
         </div>
 
         {/* Secondary Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-slate-100">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t-2 border-[#0A0A0A]">
           <div className="relative">
             <Search
-              className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
+              className="w-4 h-4 text-[#0A0A0A] absolute left-3.5 top-1/2 -translate-y-1/2"
               aria-hidden="true"
             />
             <input
@@ -261,7 +264,7 @@ export const TasksPage: React.FC = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜索任务标题关键词..."
-              className="w-full pl-9 pr-3 py-2 text-xs font-medium rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 text-xs font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
             />
           </div>
 
@@ -269,7 +272,7 @@ export const TasksPage: React.FC = () => {
             aria-label="按所属项目筛选"
             value={projectFilter}
             onChange={(e) => setProjectFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 text-slate-700 cursor-pointer"
+            className="w-full px-3 py-2 text-xs font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] text-[#0A0A0A] cursor-pointer focus:outline-none"
           >
             <option value="all">项目筛选：全部项目与独立任务</option>
             <option value="unlinked">独立任务（未关联项目）</option>
@@ -286,7 +289,7 @@ export const TasksPage: React.FC = () => {
             onChange={(e) =>
               setPriorityFilter(e.target.value as 'all' | TaskPriority)
             }
-            className="w-full px-3 py-2 text-xs font-semibold rounded-xl border border-slate-300 bg-slate-50 text-slate-700 cursor-pointer"
+            className="w-full px-3 py-2 text-xs font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] text-[#0A0A0A] cursor-pointer focus:outline-none"
           >
             <option value="all">优先级筛选：全部优先级</option>
             <option value="high">仅看：高优先级 (high)</option>
@@ -296,29 +299,29 @@ export const TasksPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Tasks Cards List */}
+      {/* Tasks List */}
       {filteredTasks.length === 0 ? (
-        <div className="bento-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto">
+        <div className="bg-white border-2 border-[#0A0A0A] p-12 text-center space-y-3">
+          <div className="w-12 h-12 bg-[#0A0A0A] text-white flex items-center justify-center mx-auto">
             <CheckSquare className="w-6 h-6" aria-hidden="true" />
           </div>
-          <div className="text-base font-extrabold text-slate-900">
+          <div className="text-base font-black text-[#0A0A0A]">
             没有找到符合筛选条件的任务
           </div>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
+          <p className="text-xs text-[#525252] max-w-md mx-auto">
             你可以调整上方筛选条件，或者直接创建一条新的学习任务。
           </p>
           <button
             type="button"
             onClick={openCreateModal}
-            className="min-h-[42px] inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-teal-700 text-white text-xs font-bold hover:bg-teal-800 cursor-pointer"
+            className="swiss-btn-primary min-h-[42px] inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold cursor-pointer"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
             新增任务
           </button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] divide-y-2 divide-[#0A0A0A]">
           {filteredTasks.map((task) => {
             const linkedProject = projects.find((p) => p.id === task.project_id);
             const overdue = isTaskOverdue(task, todayStr);
@@ -327,12 +330,12 @@ export const TasksPage: React.FC = () => {
             return (
               <div
                 key={task.id}
-                className={`bento-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 transition-all ${
+                className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 transition-colors ${
                   overdue
-                    ? 'bg-red-50/40 border-red-200 hover:border-red-300'
+                    ? 'bg-[#FFF5F5]'
                     : task.status === 'done'
-                    ? 'bg-slate-50/70 opacity-75'
-                    : 'hover:border-teal-400'
+                    ? 'bg-[#F6F5F2] opacity-75'
+                    : 'bg-white hover:bg-[#F6F5F2]'
                 }`}
               >
                 <div className="flex items-start gap-3.5 min-w-0">
@@ -343,17 +346,17 @@ export const TasksPage: React.FC = () => {
                         status: task.status === 'done' ? 'todo' : 'done',
                       })
                     }
-                    className="mt-0.5 min-w-[30px] min-h-[30px] flex items-center justify-center rounded-xl text-slate-400 hover:text-teal-600 shrink-0 cursor-pointer transition-colors"
+                    className="mt-0.5 min-w-[30px] min-h-[30px] flex items-center justify-center text-[#0A0A0A] hover:text-[#E61919] shrink-0 cursor-pointer transition-colors"
                     aria-label={`切换任务 ${task.title} 状态`}
                   >
                     {task.status === 'done' ? (
                       <CheckCircle2
-                        className="w-5 h-5 text-emerald-600"
+                        className="w-5 h-5 text-[#15803D]"
                         aria-hidden="true"
                       />
                     ) : task.status === 'doing' ? (
                       <Clock
-                        className="w-5 h-5 text-teal-600"
+                        className="w-5 h-5 text-[#0A0A0A]"
                         aria-hidden="true"
                       />
                     ) : (
@@ -363,10 +366,10 @@ export const TasksPage: React.FC = () => {
 
                   <div className="space-y-1.5 min-w-0">
                     <div
-                      className={`text-sm sm:text-base font-bold break-words ${
+                      className={`text-sm sm:text-base font-black break-words ${
                         task.status === 'done'
-                          ? 'line-through text-slate-400'
-                          : 'text-slate-900'
+                          ? 'line-through text-[#737373]'
+                          : 'text-[#0A0A0A]'
                       }`}
                     >
                       {task.title}
@@ -374,15 +377,15 @@ export const TasksPage: React.FC = () => {
 
                     <div className="flex flex-wrap items-center gap-2 text-xs">
                       <span
-                        className={`px-2.5 py-0.5 rounded-lg border text-[11px] font-bold ${pri.badgeClass}`}
+                        className={`px-2 py-0.5 border text-[11px] font-mono-swiss font-bold ${pri.badgeClass}`}
                       >
-                        {pri.label}
+                        {pri.code} · {pri.label}
                       </span>
 
                       {linkedProject ? (
                         <Link
                           to={`/projects/${linkedProject.id}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-teal-50 text-teal-800 border border-teal-200/70 hover:bg-teal-100 text-[11px] font-bold max-w-[240px] truncate"
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#F6F5F2] text-[#0A0A0A] border border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white text-[11px] font-bold max-w-[240px] truncate transition-colors"
                         >
                           <FolderKanban
                             className="w-3 h-3 shrink-0"
@@ -391,41 +394,41 @@ export const TasksPage: React.FC = () => {
                           <span className="truncate">{linkedProject.name}</span>
                         </Link>
                       ) : (
-                        <span className="px-2.5 py-0.5 rounded-lg bg-slate-100 text-slate-600 text-[11px] font-semibold">
+                        <span className="px-2.5 py-0.5 bg-[#F6F5F2] border border-[#D4D4D0] text-[#525252] text-[11px] font-mono-swiss font-bold">
                           独立任务
                         </span>
                       )}
 
                       {task.planned_date && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-slate-500 font-medium">
+                        <span className="inline-flex items-center gap-1 text-[11px] font-mono-swiss text-[#525252] font-bold">
                           <Calendar className="w-3 h-3" aria-hidden="true" />
-                          计划：{task.planned_date}
+                          PLAN: {task.planned_date}
                         </span>
                       )}
 
                       {task.due_date && (
                         <span
-                          className={`inline-flex items-center gap-1 text-[11px] ${
+                          className={`inline-flex items-center gap-1 text-[11px] font-mono-swiss ${
                             overdue
-                              ? 'text-red-700 font-extrabold'
-                              : 'text-slate-500 font-medium'
+                              ? 'text-[#E61919] font-black'
+                              : 'text-[#525252] font-bold'
                           }`}
                         >
                           <Calendar className="w-3 h-3" aria-hidden="true" />
-                          截止：{task.due_date}
+                          DUE: {task.due_date}
                         </span>
                       )}
 
                       {overdue && (
                         <span
                           data-testid="overdue-badge"
-                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-red-600 text-white text-[11px] font-bold shadow-2xs"
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#E61919] text-white text-[11px] font-mono-swiss font-bold"
                         >
                           <AlertTriangle
                             className="w-3 h-3"
                             aria-hidden="true"
                           />
-                          已逾期提醒
+                          OVERDUE · 已逾期提醒
                         </span>
                       )}
                     </div>
@@ -442,7 +445,7 @@ export const TasksPage: React.FC = () => {
                         status: e.target.value as TaskStatus,
                       })
                     }
-                    className="min-h-[38px] text-xs font-bold rounded-xl border border-slate-200 bg-slate-50 px-3 py-1.5 text-slate-700 cursor-pointer"
+                    className="min-h-[38px] text-xs font-mono-swiss font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] px-3 py-1.5 text-[#0A0A0A] cursor-pointer"
                   >
                     <option value="todo">待办</option>
                     <option value="doing">进行中</option>
@@ -452,7 +455,7 @@ export const TasksPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => openEditModal(task)}
-                    className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 cursor-pointer transition-colors"
+                    className="min-w-[38px] min-h-[38px] flex items-center justify-center border border-[#0A0A0A] bg-white hover:bg-[#0A0A0A] hover:text-white text-[#0A0A0A] cursor-pointer transition-colors"
                     title="编辑任务"
                     aria-label={`编辑任务 ${task.title}`}
                   >
@@ -462,7 +465,7 @@ export const TasksPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => deleteTask(task.id)}
-                    className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-xl border border-red-200 hover:bg-red-50 text-red-600 cursor-pointer transition-colors"
+                    className="min-w-[38px] min-h-[38px] flex items-center justify-center border border-[#0A0A0A] bg-white hover:bg-[#E61919] hover:text-white text-[#0A0A0A] cursor-pointer transition-colors"
                     title="删除任务"
                     aria-label={`删除任务 ${task.title}`}
                   >
@@ -477,16 +480,21 @@ export const TasksPage: React.FC = () => {
 
       {/* Create / Edit Task Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-teal-200 shadow-2xl w-full max-w-lg p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-extrabold text-slate-900">
-                {editingTask ? '编辑任务' : '新增学习/开发任务'}
-              </h3>
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-[#0A0A0A] shadow-[8px_8px_0px_#0A0A0A] w-full max-w-lg p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b-2 border-[#0A0A0A]">
+              <div>
+                <div className="text-[10px] font-mono-swiss font-bold uppercase tracking-widest text-[#E61919]">
+                  TASK SPECIFICATION
+                </div>
+                <h3 className="text-lg font-black text-[#0A0A0A]">
+                  {editingTask ? '编辑任务' : '新增学习/开发任务'}
+                </h3>
+              </div>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                className="min-w-[38px] min-h-[38px] flex items-center justify-center border border-[#0A0A0A] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white cursor-pointer"
                 aria-label="关闭弹窗"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
@@ -496,7 +504,7 @@ export const TasksPage: React.FC = () => {
             {formError && (
               <div
                 role="alert"
-                className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-bold"
+                className="p-3.5 bg-[#E61919] text-white text-xs font-bold"
               >
                 {formError}
               </div>
@@ -504,8 +512,8 @@ export const TasksPage: React.FC = () => {
 
             <form onSubmit={handleSave} className="space-y-4" noValidate>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  任务标题 <span className="text-red-600">*</span>
+                <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
+                  任务标题 <span className="text-[#E61919]">*</span>
                 </label>
                 <input
                   type="text"
@@ -513,18 +521,18 @@ export const TasksPage: React.FC = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="例如：完成数据结构线段树专题练习 / 编写接口单元测试"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
                   所属项目（选填，支持独立任务）
                 </label>
                 <select
                   value={projectId}
                   onChange={(e) => setProjectId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:border-teal-600 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
                 >
                   <option value="">-- 不绑定项目（作为日常独立任务） --</option>
                   {projects.map((p) => (
@@ -537,13 +545,13 @@ export const TasksPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
                     任务状态
                   </label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white"
+                    className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2]"
                   >
                     <option value="todo">待办 (todo)</option>
                     <option value="doing">进行中 (doing)</option>
@@ -552,7 +560,7 @@ export const TasksPage: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
                     优先级
                   </label>
                   <select
@@ -560,7 +568,7 @@ export const TasksPage: React.FC = () => {
                     onChange={(e) =>
                       setPriority(e.target.value as TaskPriority)
                     }
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white"
+                    className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2]"
                   >
                     <option value="high">高优先级 (high)</option>
                     <option value="medium">中优先级 (medium)</option>
@@ -571,42 +579,42 @@ export const TasksPage: React.FC = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
                     计划执行日期 (planned_date)
                   </label>
                   <input
                     type="date"
                     value={plannedDate}
                     onChange={(e) => setPlannedDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300"
+                    className="w-full px-3.5 py-2.5 text-sm font-mono-swiss border-2 border-[#0A0A0A] bg-[#F6F5F2]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
                     截止日期 (due_date)
                   </label>
                   <input
                     type="date"
                     value={dueDate}
                     onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300"
+                    className="w-full px-3.5 py-2.5 text-sm font-mono-swiss border-2 border-[#0A0A0A] bg-[#F6F5F2]"
                   />
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t-2 border-[#0A0A0A]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="min-h-[42px] px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                  className="swiss-btn-outline min-h-[42px] px-4 py-2 text-xs font-bold cursor-pointer"
                 >
                   取消
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="min-h-[42px] px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-xs font-bold text-white cursor-pointer"
+                  className="swiss-btn-accent min-h-[42px] px-5 py-2 disabled:opacity-50 text-xs font-bold cursor-pointer"
                 >
                   {submitting ? '保存中...' : '保存任务'}
                 </button>

@@ -2,16 +2,10 @@ import React, { useState } from 'react';
 import { Navigate, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
-  Award,
-  BookOpenCheck,
   CheckCircle2,
-  Compass,
-  FolderKanban,
   Lock,
   Mail,
   ShieldCheck,
-  Sparkles,
-  Target,
   User,
   Users,
 } from 'lucide-react';
@@ -65,157 +59,119 @@ export const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-canvas-pattern flex flex-col lg:flex-row overflow-x-hidden">
-      {/* Left Hero & Bento Feature Showcase */}
-      <div className="lg:w-[55%] bg-mesh-teal text-white p-6 sm:p-10 lg:p-14 flex flex-col justify-between relative overflow-hidden">
-        <div className="space-y-6 relative z-10">
-          {/* Brand Pill */}
-          <div className="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-2 rounded-full text-xs font-bold text-teal-200">
-            <Compass className="w-4 h-4 text-teal-300" aria-hidden="true" />
-            <span>StudyFlow · 学程 —— 大学生学习与项目管理平台</span>
+    <div className="min-h-screen bg-[#F6F5F2] text-[#0A0A0A] flex flex-col lg:flex-row overflow-x-hidden">
+      {/* Left Column: Swiss International Typographic Poster Grid */}
+      <div className="lg:w-[56%] border-b-2 lg:border-b-0 lg:border-r-2 border-[#0A0A0A] flex flex-col justify-between bg-white">
+        {/* Top Meta Strip */}
+        <div className="grid grid-cols-3 border-b-2 border-[#0A0A0A] font-mono-swiss text-[11px] font-bold">
+          <div className="p-3 sm:p-4 border-r border-[#0A0A0A] flex items-center gap-2">
+            <span className="w-2.5 h-2.5 bg-[#E61919] inline-block shrink-0" />
+            <span>STUDYFLOW // 学程</span>
+          </div>
+          <div className="p-3 sm:p-4 border-r border-[#0A0A0A] text-[#525252] truncate">
+            SWISS GRID SYSTEM
+          </div>
+          <div className="p-3 sm:p-4 text-right">SPEC // MVP v1.0</div>
+        </div>
+
+        {/* Hero Typographic Statement */}
+        <div className="p-6 sm:p-10 lg:p-12 space-y-6">
+          <div className="inline-block px-2.5 py-1 bg-[#0A0A0A] text-white font-mono-swiss text-xs font-bold uppercase tracking-widest">
+            UNIVERSITY LEARNING & PROJECT ARCHITECTURE
           </div>
 
-          <div className="space-y-3 max-w-2xl">
-            <h1 className="text-2xl sm:text-4xl lg:text-[40px] font-extrabold tracking-tight leading-[1.18]">
-              从算法竞赛到软件工程，
-              <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-emerald-200 to-orange-300">
-                让每一次努力都汇聚成可见的成长。
-              </span>
-            </h1>
-            <p className="text-sm sm:text-base text-teal-100/80 leading-relaxed">
-              面向大学生专业学习、程序设计竞赛与个人工程项目开发，打造
-              <strong className="text-white font-semibold mx-1">
-                “目标制定 → 项目规划 → 任务执行 → 进度统计 → 周期复盘”
-              </strong>
-              全链路个人工程管理工作台。
+          <h1 className="text-3xl sm:text-5xl lg:text-[54px] font-black tracking-tighter leading-[1.06] uppercase">
+            不止记录待办，
+            <br />
+            <span className="text-[#E61919]">构建目标与工程</span>
+            <br />
+            的精确闭环。
+          </h1>
+
+          <p className="text-sm sm:text-base text-[#525252] max-w-xl leading-relaxed font-medium">
+            面向大学生课程学习、程序设计竞赛训练（蓝桥杯 / 码蹄杯 / 天梯赛）与个人软件工程开发，以瑞士网格秩序串联
+            <strong className="text-[#0A0A0A] font-extrabold mx-1">
+              目标制定 → 项目规划 → 任务执行 → 进度统计 → 周期复盘
+            </strong>
+            全流程。
+          </p>
+        </div>
+
+        {/* 4-Cell Swiss Specification Matrix */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 border-t-2 border-[#0A0A0A]">
+          <div className="p-5 sm:p-6 border-b sm:border-r border-[#0A0A0A] space-y-2">
+            <div className="flex items-center justify-between font-mono-swiss text-xs font-bold">
+              <span className="text-[#E61919]">01 / GOALS & PROJECTS</span>
+              <span>[AC-06]</span>
+            </div>
+            <div className="text-base font-extrabold">
+              目标拆解与 60% 实时完成率
+            </div>
+            <p className="text-xs text-[#525252] leading-relaxed">
+              项目进度由子任务自动核算（如 5 项任务完成 3 项即精确输出 60%），删除项目自动保留历史任务并解除关联（AC-04）。
             </p>
           </div>
 
-          {/* Bento Grid Visual Showcase */}
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3.5 pt-2 max-w-2xl">
-            {/* Bento Tile 1: Live Project Progress Preview (7 cols) */}
-            <div className="sm:col-span-7 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 p-5 flex flex-col justify-between gap-4">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-teal-300">
-                    Bento Progress Engine · AC-06
-                  </span>
-                  <h2 className="text-base font-bold text-white mt-1">
-                    StudyFlow 平台 MVP 研发进度
-                  </h2>
-                </div>
-                <span className="px-2.5 py-1 rounded-xl bg-orange-500 text-slate-950 font-black text-xs shrink-0">
-                  60% 已完成
-                </span>
-              </div>
-
-              <div className="space-y-2">
-                <div className="w-full h-2.5 rounded-full bg-black/30 overflow-hidden">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-teal-300 to-orange-400"
-                    style={{ width: '60%' }}
-                  />
-                </div>
-                <div className="flex items-center justify-between text-xs text-teal-200/85">
-                  <span>子任务自动核算：3 / 5 项已完成</span>
-                  <span>删项目自动保留任务 (AC-04)</span>
-                </div>
-              </div>
+          <div className="p-5 sm:p-6 border-b border-[#0A0A0A] space-y-2">
+            <div className="flex items-center justify-between font-mono-swiss text-xs font-bold">
+              <span className="text-[#E61919]">02 / OVERDUE CONTROL</span>
+              <span>[AC-05]</span>
             </div>
-
-            {/* Bento Tile 2: Security & RLS Isolation (5 cols) */}
-            <div className="sm:col-span-5 rounded-2xl bg-white/8 backdrop-blur-md border border-white/15 p-5 flex flex-col justify-between gap-3">
-              <div className="w-9 h-9 rounded-xl bg-teal-400/20 border border-teal-300/30 flex items-center justify-center text-teal-300">
-                <ShieldCheck className="w-5 h-5" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="text-sm font-bold text-white">
-                  PostgreSQL RLS 安全隔离
-                </h2>
-                <p className="text-xs text-teal-100/75 mt-1 leading-relaxed">
-                  行级安全策略严格隔离多用户数据，自动拦截跨用户读取与外键越权关联（AC-10）。
-                </p>
-              </div>
+            <div className="text-base font-extrabold">
+              计划日期与逾期高亮督办
             </div>
-
-            {/* Bento Tile 3: 4 Core Pillars Row (12 cols) */}
-            <div className="sm:col-span-12 grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-              {[
-                {
-                  icon: Target,
-                  title: '目标管理',
-                  desc: '长期方向拆解',
-                },
-                {
-                  icon: FolderKanban,
-                  title: '项目里程碑',
-                  desc: '实时进度百分比',
-                },
-                {
-                  icon: Sparkles,
-                  title: '逾期督办',
-                  desc: '计划与截止预警',
-                },
-                {
-                  icon: BookOpenCheck,
-                  title: '自然周复盘',
-                  desc: '同周 Upsert 防重',
-                },
-              ].map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={item.title}
-                    className="rounded-xl bg-white/6 border border-white/10 p-3.5 space-y-1"
-                  >
-                    <Icon
-                      className="w-4 h-4 text-teal-300"
-                      aria-hidden="true"
-                    />
-                    <div className="text-xs font-bold text-white">
-                      {item.title}
-                    </div>
-                    <div className="text-[11px] text-teal-200/70">
-                      {item.desc}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+            <p className="text-xs text-[#525252] leading-relaxed">
+              区分计划执行日（planned_date）与最后截止日（due_date），未完成且逾期的任务自动触发瑞士红高对比警示。
+            </p>
           </div>
-        </div>
 
-        {/* Footer Badges */}
-        <div className="mt-8 pt-5 border-t border-white/10 flex flex-wrap items-center justify-between gap-3 text-xs text-teal-200/75 relative z-10">
-          <div className="flex items-center gap-2">
-            <Award className="w-4 h-4 text-orange-400" aria-hidden="true" />
-            <span>成长主线：码蹄杯省赛银奖 / 蓝桥杯省三 → 软件开发工程师工程实践</span>
+          <div className="p-5 sm:p-6 border-b sm:border-b-0 sm:border-r border-[#0A0A0A] space-y-2">
+            <div className="flex items-center justify-between font-mono-swiss text-xs font-bold">
+              <span className="text-[#E61919]">03 / WEEKLY UPSERT</span>
+              <span>[AC-08]</span>
+            </div>
+            <div className="text-base font-extrabold">
+              自然周唯一复盘归档
+            </div>
+            <p className="text-xs text-[#525252] leading-relaxed">
+              自动将所选日期归一化至所在周周一（week_start），同一自然周重复保存自动覆盖更新原记录，杜绝重复归档。
+            </p>
           </div>
-          <span className="font-semibold text-teal-300">
-            React 19 + TypeScript + Supabase RLS
-          </span>
+
+          <div className="p-5 sm:p-6 space-y-2 bg-[#F6F5F2]">
+            <div className="flex items-center justify-between font-mono-swiss text-xs font-bold">
+              <span className="text-[#E61919]">04 / POSTGRESQL RLS</span>
+              <span>[AC-10]</span>
+            </div>
+            <div className="text-base font-extrabold flex items-center gap-1.5">
+              <ShieldCheck className="w-4 h-4" aria-hidden="true" />
+              <span>行级安全与多用户隔离</span>
+            </div>
+            <p className="text-xs text-[#525252] leading-relaxed">
+              严格校验 user_id 所有权与外键归属，彻底阻断跨用户读取、篡改或将任务绑定至他人项目的越权行为。
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Right Authentication & Quick Demo Switcher Panel */}
-      <div className="lg:w-[45%] flex items-center justify-center p-4 sm:p-8 lg:p-12">
-        <div className="w-full max-w-md bento-card p-6 sm:p-8 space-y-6 bg-white">
-          {/* Segmented Tab Switcher */}
-          <div className="grid grid-cols-2 bg-slate-100 p-1.5 rounded-2xl">
+      {/* Right Column: Sharp Swiss Authentication Console */}
+      <div className="lg:w-[44%] flex items-center justify-center p-4 sm:p-8 lg:p-12">
+        <div className="w-full max-w-md bg-white border-2 border-[#0A0A0A] shadow-[8px_8px_0px_#0A0A0A]">
+          {/* Mode Switch Header */}
+          <div className="grid grid-cols-2 border-b-2 border-[#0A0A0A]">
             <button
               type="button"
               onClick={() => {
                 setTab('login');
                 setErrorMsg(null);
               }}
-              className={`min-h-[42px] py-2 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+              className={`min-h-[48px] font-mono-swiss text-xs font-extrabold uppercase tracking-wider cursor-pointer transition-colors ${
                 tab === 'login'
-                  ? 'bg-teal-700 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0A0A0A] text-white'
+                  : 'bg-[#F6F5F2] text-[#0A0A0A] hover:bg-neutral-200'
               }`}
             >
-              登录账号
+              01 // 登录 LOGIN
             </button>
             <button
               type="button"
@@ -225,181 +181,184 @@ export const LoginPage: React.FC = () => {
                 setPassword('');
                 setErrorMsg(null);
               }}
-              className={`min-h-[42px] py-2 text-sm font-bold rounded-xl transition-all cursor-pointer ${
+              className={`min-h-[48px] font-mono-swiss text-xs font-extrabold uppercase tracking-wider border-l-2 border-[#0A0A0A] cursor-pointer transition-colors ${
                 tab === 'register'
-                  ? 'bg-teal-700 text-white shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#0A0A0A] text-white'
+                  : 'bg-[#F6F5F2] text-[#0A0A0A] hover:bg-neutral-200'
               }`}
             >
-              注册新账号
+              02 // 注册 REGISTER
             </button>
           </div>
 
-          <div>
-            <h2 className="text-xl font-extrabold text-slate-900">
-              {tab === 'login'
-                ? '欢迎回到 StudyFlow 工作台'
-                : '创建你的个人学习空间'}
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              {tab === 'login'
-                ? '登录以管理你的学习目标、开发项目与每周成长复盘。'
-                : '注册后系统将为你分配独立隔离的个人学习数据库。'}
-            </p>
-          </div>
-
-          {errorMsg && (
-            <div
-              role="alert"
-              className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-semibold"
-            >
-              {errorMsg}
+          <div className="p-6 sm:p-8 space-y-6">
+            <div className="border-l-4 border-[#E61919] pl-3.5">
+              <h2 className="text-xl font-black tracking-tight">
+                {tab === 'login' ? '身份认证与工作台入口' : '注册新学生账户'}
+              </h2>
+              <p className="text-xs text-[#525252] mt-0.5">
+                {tab === 'login'
+                  ? '验证身份以载入个人专属目标、项目与周复盘数据。'
+                  : '创建全新隔离账户，支持完整 CRUD 与持久化验证。'}
+              </p>
             </div>
-          )}
 
-          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            {tab === 'register' && (
-              <div>
-                <label
-                  htmlFor="register-name"
-                  className="block text-xs font-bold text-slate-700 mb-1.5"
-                >
-                  姓名 / 昵称（选填）
-                </label>
-                <div className="relative">
-                  <User
-                    className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
-                    aria-hidden="true"
-                  />
-                  <input
-                    id="register-name"
-                    type="text"
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="例如：杜同学"
-                    className="w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
-                  />
-                </div>
+            {errorMsg && (
+              <div
+                role="alert"
+                className="p-3.5 bg-[#E61919] text-white border border-[#0A0A0A] text-xs font-bold"
+              >
+                ERROR // {errorMsg}
               </div>
             )}
 
-            <div>
-              <label
-                htmlFor="auth-email"
-                className="block text-xs font-bold text-slate-700 mb-1.5"
-              >
-                邮箱地址 <span className="text-red-600">*</span>
-              </label>
-              <div className="relative">
-                <Mail
-                  className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
-                  aria-hidden="true"
-                />
-                <input
-                  id="auth-email"
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="coder@studyflow.edu.cn"
-                  className="w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="auth-password"
-                className="block text-xs font-bold text-slate-700 mb-1.5"
-              >
-                登录密码（至少 6 位） <span className="text-red-600">*</span>
-              </label>
-              <div className="relative">
-                <Lock
-                  className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
-                  aria-hidden="true"
-                />
-                <input
-                  id="auth-password"
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="请输入至少 6 位密码"
-                  className="w-full pl-10 pr-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
-                />
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="min-h-[46px] w-full flex items-center justify-center gap-2 py-2.5 px-5 rounded-xl bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-white font-bold text-sm shadow-md shadow-teal-900/10 transition-all cursor-pointer"
-            >
-              <span>{tab === 'login' ? '进入学习工作台' : '立即注册并登录'}</span>
-              <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </button>
-          </form>
-
-          {/* One-Click Demo Passkeys */}
-          {mode === 'local' && (
-            <div className="pt-5 border-t border-slate-200/80 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-extrabold text-slate-800">
-                  比赛答辩一键体验通道（免输密码）
-                </span>
-                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
-                  预置真实案例
-                </span>
-              </div>
-
-              <div className="space-y-2.5">
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('A')}
-                  className="w-full text-left p-3.5 rounded-2xl border-2 border-teal-600/30 bg-teal-50/50 hover:bg-teal-50 hover:border-teal-600 transition-all cursor-pointer group"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-extrabold text-teal-950 flex items-center gap-2">
-                      <CheckCircle2
-                        className="w-4 h-4 text-teal-600 shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span>一键进入：竞赛生主账号 (User A)</span>
-                    </span>
-                    <span className="text-xs font-bold text-orange-600 group-hover:translate-x-0.5 transition-transform">
-                      推荐演示 →
-                    </span>
+            <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              {tab === 'register' && (
+                <div>
+                  <label
+                    htmlFor="register-name"
+                    className="block font-mono-swiss text-[11px] font-bold uppercase text-[#0A0A0A] mb-1.5"
+                  >
+                    DISPLAY NAME / 姓名昵称
+                  </label>
+                  <div className="relative">
+                    <User
+                      className="w-4 h-4 text-[#525252] absolute left-3.5 top-1/2 -translate-y-1/2"
+                      aria-hidden="true"
+                    />
+                    <input
+                      id="register-name"
+                      type="text"
+                      value={displayName}
+                      onChange={(e) => setDisplayName(e.target.value)}
+                      placeholder="例如：杜同学"
+                      className="w-full pl-10 pr-3.5 py-2.5 text-sm border border-[#0A0A0A] bg-white focus:outline-none"
+                    />
                   </div>
-                  <p className="mt-1 text-[11px] text-slate-600 leading-relaxed">
-                    内置“算法竞赛 → 软件开发工程师转型”目标、StudyFlow 项目（3/5 完成度 60%）、逾期警示与双周复盘。
-                  </p>
-                </button>
+                </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={() => handleQuickDemo('B')}
-                  className="w-full text-left p-3.5 rounded-2xl border border-slate-200 bg-slate-50/70 hover:bg-slate-100 hover:border-slate-300 transition-all cursor-pointer"
+              <div>
+                <label
+                  htmlFor="auth-email"
+                  className="block font-mono-swiss text-[11px] font-bold uppercase text-[#0A0A0A] mb-1.5"
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-800 flex items-center gap-2">
-                      <Users
-                        className="w-4 h-4 text-orange-600 shrink-0"
-                        aria-hidden="true"
-                      />
-                      <span>一键进入：隔离测试账号 (User B)</span>
-                    </span>
-                    <span className="text-[11px] font-semibold text-slate-500">
-                      验证 AC-10 隔离
-                    </span>
-                  </div>
-                  <p className="mt-1 text-[11px] text-slate-500">
-                    独立账户（{DEMO_USER_B.email}），用于现场对比演示多用户 RLS 数据完全隔离。
-                  </p>
-                </button>
+                  EMAIL ADDRESS / 邮箱 <span className="text-[#E61919]">*</span>
+                </label>
+                <div className="relative">
+                  <Mail
+                    className="w-4 h-4 text-[#525252] absolute left-3.5 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
+                  <input
+                    id="auth-email"
+                    type="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="coder@studyflow.edu.cn"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-sm font-mono-swiss border border-[#0A0A0A] bg-white focus:outline-none"
+                  />
+                </div>
               </div>
-            </div>
-          )}
+
+              <div>
+                <label
+                  htmlFor="auth-password"
+                  className="block font-mono-swiss text-[11px] font-bold uppercase text-[#0A0A0A] mb-1.5"
+                >
+                  PASSWORD / 密码（&gt;=6位）{' '}
+                  <span className="text-[#E61919]">*</span>
+                </label>
+                <div className="relative">
+                  <Lock
+                    className="w-4 h-4 text-[#525252] absolute left-3.5 top-1/2 -translate-y-1/2"
+                    aria-hidden="true"
+                  />
+                  <input
+                    id="auth-password"
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="******"
+                    className="w-full pl-10 pr-3.5 py-2.5 text-sm font-mono-swiss border border-[#0A0A0A] bg-white focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="min-h-[46px] w-full swiss-btn-accent py-2.5 px-5 text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                <span>
+                  {tab === 'login'
+                    ? '进入工作台 // ENTER WORKSPACE'
+                    : '创建账户 // CREATE ACCOUNT'}
+                </span>
+                <ArrowRight className="w-4 h-4" aria-hidden="true" />
+              </button>
+            </form>
+
+            {/* Quick Demo Passkeys */}
+            {mode === 'local' && (
+              <div className="pt-5 border-t-2 border-[#0A0A0A] space-y-3">
+                <div className="flex items-center justify-between font-mono-swiss text-[11px] font-bold">
+                  <span>QUICK ACCESS // 答辩免密通道</span>
+                  <span className="px-1.5 py-0.5 bg-[#0A0A0A] text-white">
+                    SEED READY
+                  </span>
+                </div>
+
+                <div className="space-y-2.5">
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo('A')}
+                    className="w-full text-left p-3.5 border border-[#0A0A0A] bg-[#F6F5F2] hover:bg-[#0A0A0A] hover:text-white transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-extrabold flex items-center gap-2">
+                        <CheckCircle2
+                          className="w-4 h-4 text-[#E61919] shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>一键进入：竞赛生主账号 (User A)</span>
+                      </span>
+                      <span className="font-mono-swiss text-[11px] font-bold text-[#E61919] group-hover:text-white">
+                        [ENTER →]
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[11px] text-[#525252] group-hover:text-neutral-300 leading-relaxed">
+                      预置“算法竞赛 → 软件开发工程师转型”目标、StudyFlow 项目（3/5 完成率 60%）、逾期警示与周复盘。
+                    </p>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleQuickDemo('B')}
+                    className="w-full text-left p-3.5 border border-[#0A0A0A] bg-white hover:bg-[#0A0A0A] hover:text-white transition-colors cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold flex items-center gap-2">
+                        <Users
+                          className="w-4 h-4 text-[#0A0A0A] group-hover:text-white shrink-0"
+                          aria-hidden="true"
+                        />
+                        <span>一键进入：隔离测试账号 (User B)</span>
+                      </span>
+                      <span className="font-mono-swiss text-[11px] text-[#525252] group-hover:text-neutral-300">
+                        [AC-10 隔离]
+                      </span>
+                    </div>
+                    <p className="mt-1 text-[11px] text-[#525252] group-hover:text-neutral-300">
+                      独立账户（{DEMO_USER_B.email}），用于现场对比验证多用户数据隔离。
+                    </p>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

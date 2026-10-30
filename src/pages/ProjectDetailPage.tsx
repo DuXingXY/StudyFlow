@@ -21,9 +21,9 @@ import {
 } from '../utils/dateUtils';
 
 const priorityBadge: Record<TaskPriority, { label: string; cls: string }> = {
-  high: { label: '高优', cls: 'bg-red-50 text-red-700 border-red-200' },
-  medium: { label: '中优', cls: 'bg-amber-50 text-amber-800 border-amber-200' },
-  low: { label: '低优', cls: 'bg-slate-100 text-slate-600 border-slate-200' },
+  high: { label: 'HIGH / 高优', cls: 'bg-[#E61919] text-white border-[#E61919]' },
+  medium: { label: 'MED / 中优', cls: 'bg-[#0A0A0A] text-white border-[#0A0A0A]' },
+  low: { label: 'LOW / 低优', cls: 'bg-[#F6F5F2] text-[#525252] border-[#0A0A0A]' },
 };
 
 export const ProjectDetailPage: React.FC = () => {
@@ -54,19 +54,19 @@ export const ProjectDetailPage: React.FC = () => {
 
   if (!project) {
     return (
-      <div className="bento-card p-10 text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center mx-auto">
+      <div className="bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] p-10 text-center space-y-4">
+        <div className="w-12 h-12 bg-[#E61919] text-white flex items-center justify-center mx-auto">
           <ShieldAlert className="w-6 h-6" aria-hidden="true" />
         </div>
-        <h2 className="text-lg font-extrabold text-slate-900">
+        <h2 className="text-lg font-black text-[#0A0A0A]">
           项目不存在或无权访问 (AC-10 安全隔离)
         </h2>
-        <p className="text-xs text-slate-500 max-w-md mx-auto">
+        <p className="text-xs text-[#525252] max-w-md mx-auto">
           未找到该项目，或该项目归属于其他用户账户，已被 Row Level Security (RLS) 安全策略拦截。
         </p>
         <Link
           to="/projects"
-          className="min-h-[42px] inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-teal-700 text-white text-xs font-bold hover:bg-teal-800"
+          className="swiss-btn-primary min-h-[42px] inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
           返回我的项目列表
@@ -119,48 +119,48 @@ export const ProjectDetailPage: React.FC = () => {
       <div className="flex items-center justify-between gap-2">
         <Link
           to="/projects"
-          className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:border-teal-400 hover:text-teal-800 transition-colors"
+          className="swiss-btn-outline min-h-[38px] inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-mono-swiss font-bold"
         >
           <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          <span>返回我的项目</span>
+          <span>BACK // 返回我的项目</span>
         </Link>
 
         <button
           type="button"
           onClick={handleDeleteCurrentProject}
-          className="min-h-[38px] inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-red-200 bg-white text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+          className="min-h-[38px] inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-[#0A0A0A] bg-white text-xs font-mono-swiss font-bold text-[#E61919] hover:bg-[#E61919] hover:text-white cursor-pointer transition-colors"
         >
           <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
           <span>删除项目（保留任务）</span>
         </button>
       </div>
 
-      {/* Hero Project Overview Bento Card */}
-      <div className="bento-card p-6 sm:p-7 space-y-5">
+      {/* Hero Project Overview Frame */}
+      <div className="bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] p-6 sm:p-7 space-y-5">
         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div className="space-y-2.5 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-3 py-0.5 rounded-full">
-                <Target className="w-3.5 h-3.5" aria-hidden="true" />
+              <span className="inline-flex items-center gap-1.5 text-xs font-mono-swiss font-bold text-[#0A0A0A] bg-[#F6F5F2] border border-[#0A0A0A] px-3 py-0.5">
+                <Target className="w-3.5 h-3.5 text-[#E61919]" aria-hidden="true" />
                 {linkedGoal ? linkedGoal.title : '独立项目（未关联目标）'}
               </span>
               {project.due_date && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-0.5 rounded-full">
+                <span className="inline-flex items-center gap-1.5 text-xs font-mono-swiss font-bold text-[#0A0A0A] bg-[#F6F5F2] border border-[#0A0A0A] px-3 py-0.5">
                   <Calendar
-                    className="w-3.5 h-3.5 text-teal-700"
+                    className="w-3.5 h-3.5 text-[#E61919]"
                     aria-hidden="true"
                   />
-                  项目截止：{project.due_date}
+                  DUE: {project.due_date}
                 </span>
               )}
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 break-words">
+            <h1 className="text-xl sm:text-2xl font-black text-[#0A0A0A] break-words tracking-tight">
               {project.name}
             </h1>
 
             {project.description && (
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed break-words">
+              <p className="text-xs sm:text-sm text-[#525252] leading-relaxed break-words">
                 {project.description}
               </p>
             )}
@@ -175,23 +175,23 @@ export const ProjectDetailPage: React.FC = () => {
                   status: e.target.value as ProjectStatus,
                 })
               }
-              className="min-h-[40px] text-xs font-bold rounded-xl border border-slate-300 bg-slate-50 px-3.5 py-2 text-slate-800 cursor-pointer"
+              className="min-h-[40px] text-xs font-mono-swiss font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] px-3.5 py-2 text-[#0A0A0A] cursor-pointer focus:outline-none"
             >
-              <option value="active">项目状态：进行中</option>
-              <option value="completed">项目状态：已完成</option>
-              <option value="on_hold">项目状态：已搁置</option>
+              <option value="active">STATUS: 进行中 (ACTIVE)</option>
+              <option value="completed">STATUS: 已完成 (DONE)</option>
+              <option value="on_hold">STATUS: 已搁置 (HOLD)</option>
             </select>
           </div>
         </div>
 
         {/* Highlighted Project Completion Rate Bar (AC-06) */}
-        <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-teal-950 to-teal-900 text-white space-y-3">
+        <div className="p-4 sm:p-5 bg-[#0A0A0A] text-white border-2 border-[#0A0A0A] space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-xs font-extrabold text-teal-200 uppercase tracking-wider">
-                项目实时完成率 (AC-06)
+              <span className="text-[11px] font-mono-swiss font-bold text-[#E61919] uppercase tracking-[0.2em]">
+                REAL-TIME COMPLETION RATE // 项目实时完成率 (AC-06)
               </span>
-              <div className="text-xs text-teal-100/80 mt-0.5">
+              <div className="text-xs text-[#A3A3A3] mt-0.5 font-mono-swiss">
                 {progress.totalTasks === 0
                   ? '当前尚无子任务，添加并完成任务后自动计算百分比'
                   : `已完成 ${progress.completedTasks} 项 / 共 ${progress.totalTasks} 项子任务`}
@@ -199,18 +199,16 @@ export const ProjectDetailPage: React.FC = () => {
             </div>
             <span
               data-testid="project-detail-progress"
-              className="text-2xl font-black text-orange-400"
+              className="text-3xl font-mono-swiss font-black text-white"
             >
               {progress.label}
             </span>
           </div>
 
-          <div className="w-full h-3 rounded-full bg-white/15 overflow-hidden">
+          <div className="w-full h-3 bg-[#262626] border border-white/25 overflow-hidden">
             <div
-              className={`h-full rounded-full transition-all duration-300 ${
-                progress.percentage === 100
-                  ? 'bg-emerald-400'
-                  : 'bg-gradient-to-r from-teal-300 to-orange-400'
+              className={`h-full transition-all duration-300 ${
+                progress.percentage === 100 ? 'bg-white' : 'bg-[#E61919]'
               }`}
               style={{ width: `${progress.percentage ?? 0}%` }}
             />
@@ -218,15 +216,20 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Quick Add Subtask Bento Form */}
-      <div className="bento-card p-5 sm:p-6 space-y-3.5">
-        <h2 className="text-sm font-extrabold text-slate-900">
-          为当前项目拆解新任务
-        </h2>
+      {/* Quick Add Subtask Swiss Form */}
+      <div className="bg-white border-2 border-[#0A0A0A] p-5 sm:p-6 space-y-3.5">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-black text-[#0A0A0A] uppercase tracking-wider">
+            QUICK SUBTASK BREAKDOWN // 为当前项目拆解新任务
+          </h2>
+          <span className="text-[10px] font-mono-swiss font-bold text-[#525252]">
+            AC-04 / AC-06
+          </span>
+        </div>
         {taskError && (
           <div
             role="alert"
-            className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-bold"
+            className="p-3 bg-[#E61919] text-white text-xs font-bold"
           >
             {taskError}
           </div>
@@ -241,12 +244,12 @@ export const ProjectDetailPage: React.FC = () => {
             value={taskTitle}
             onChange={(e) => setTaskTitle(e.target.value)}
             placeholder="输入子任务标题，例如：完成接口异常处理联调..."
-            className="sm:col-span-5 px-3.5 py-2.5 text-xs sm:text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
+            className="sm:col-span-5 px-3.5 py-2.5 text-xs sm:text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
           />
           <select
             value={taskPriority}
             onChange={(e) => setTaskPriority(e.target.value as TaskPriority)}
-            className="sm:col-span-2 px-3 py-2.5 text-xs font-semibold rounded-xl border border-slate-300 bg-white"
+            className="sm:col-span-2 px-3 py-2.5 text-xs font-mono-swiss font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2]"
           >
             <option value="high">高优先级</option>
             <option value="medium">中优先级</option>
@@ -257,18 +260,18 @@ export const ProjectDetailPage: React.FC = () => {
             value={taskPlannedDate}
             onChange={(e) => setTaskPlannedDate(e.target.value)}
             title="计划执行日期"
-            className="sm:col-span-2 px-2.5 py-2.5 text-xs rounded-xl border border-slate-300"
+            className="sm:col-span-2 px-2.5 py-2.5 text-xs font-mono-swiss border-2 border-[#0A0A0A] bg-[#F6F5F2]"
           />
           <input
             type="date"
             value={taskDueDate}
             onChange={(e) => setTaskDueDate(e.target.value)}
             title="截止日期"
-            className="sm:col-span-2 px-2.5 py-2.5 text-xs rounded-xl border border-slate-300"
+            className="sm:col-span-2 px-2.5 py-2.5 text-xs font-mono-swiss border-2 border-[#0A0A0A] bg-[#F6F5F2]"
           />
           <button
             type="submit"
-            className="min-h-[42px] sm:col-span-1 inline-flex items-center justify-center gap-1 px-3 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold cursor-pointer transition-colors"
+            className="swiss-btn-accent min-h-[42px] sm:col-span-1 inline-flex items-center justify-center gap-1 px-3 py-2.5 text-xs font-bold cursor-pointer"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
             <span className="sm:hidden">添加任务</span>
@@ -277,28 +280,28 @@ export const ProjectDetailPage: React.FC = () => {
       </div>
 
       {/* Project Tasks List */}
-      <div className="bento-card p-5 sm:p-6 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-slate-100">
-          <h2 className="text-base font-extrabold text-slate-900">
+      <div className="bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] p-5 sm:p-6 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b-2 border-[#0A0A0A]">
+          <h2 className="text-base font-black text-[#0A0A0A]">
             项目所属子任务 ({projectTasks.length})
           </h2>
           <div className="flex flex-wrap gap-1.5">
             {(
               [
-                { key: 'all', label: '全部' },
-                { key: 'todo', label: '待办' },
-                { key: 'doing', label: '进行中' },
-                { key: 'done', label: '已完成' },
+                { key: 'all', label: 'ALL / 全部' },
+                { key: 'todo', label: 'TODO / 待办' },
+                { key: 'doing', label: 'DOING / 进行中' },
+                { key: 'done', label: 'DONE / 已完成' },
               ] as const
             ).map((t) => (
               <button
                 key={t.key}
                 type="button"
                 onClick={() => setStatusFilter(t.key)}
-                className={`min-h-[34px] px-3 py-1 rounded-xl text-xs font-bold cursor-pointer transition-colors ${
+                className={`min-h-[34px] px-3 py-1 text-xs font-mono-swiss font-bold border cursor-pointer transition-colors ${
                   statusFilter === t.key
-                    ? 'bg-teal-700 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-teal-50 hover:text-teal-900'
+                    ? 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
+                    : 'bg-[#F6F5F2] text-[#0A0A0A] border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
                 }`}
               >
                 {t.label}
@@ -308,23 +311,23 @@ export const ProjectDetailPage: React.FC = () => {
         </div>
 
         {filteredTasks.length === 0 ? (
-          <div className="py-10 text-center text-xs text-slate-400">
+          <div className="py-10 text-center text-xs font-mono-swiss text-[#525252]">
             当前筛选下暂无子任务，可在上方输入框快速拆解添加。
           </div>
         ) : (
-          <div className="space-y-2.5">
+          <div className="divide-y divide-[#0A0A0A] border border-[#0A0A0A]">
             {filteredTasks.map((task) => {
               const overdue = isTaskOverdue(task, todayStr);
               const pri = priorityBadge[task.priority];
               return (
                 <div
                   key={task.id}
-                  className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
+                  className={`p-3.5 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${
                     overdue
-                      ? 'bg-red-50/40 border-red-200'
+                      ? 'bg-[#FFF5F5]'
                       : task.status === 'done'
-                      ? 'bg-slate-50/70 border-slate-200/70 opacity-75'
-                      : 'bg-white border-slate-200/90 hover:border-teal-300'
+                      ? 'bg-[#F6F5F2] opacity-75'
+                      : 'bg-white hover:bg-[#F6F5F2]'
                   }`}
                 >
                   <div className="flex items-start gap-3 min-w-0">
@@ -335,17 +338,17 @@ export const ProjectDetailPage: React.FC = () => {
                           status: task.status === 'done' ? 'todo' : 'done',
                         })
                       }
-                      className="mt-0.5 min-w-[28px] min-h-[28px] flex items-center justify-center text-slate-400 hover:text-teal-600 shrink-0 cursor-pointer"
+                      className="mt-0.5 min-w-[28px] min-h-[28px] flex items-center justify-center text-[#0A0A0A] hover:text-[#E61919] shrink-0 cursor-pointer"
                       aria-label={`切换任务 ${task.title} 完成状态`}
                     >
                       {task.status === 'done' ? (
                         <CheckCircle2
-                          className="w-5 h-5 text-emerald-600"
+                          className="w-5 h-5 text-[#15803D]"
                           aria-hidden="true"
                         />
                       ) : task.status === 'doing' ? (
                         <Clock
-                          className="w-5 h-5 text-teal-600"
+                          className="w-5 h-5 text-[#0A0A0A]"
                           aria-hidden="true"
                         />
                       ) : (
@@ -357,42 +360,42 @@ export const ProjectDetailPage: React.FC = () => {
                       <div
                         className={`text-sm font-bold break-words ${
                           task.status === 'done'
-                            ? 'line-through text-slate-400'
-                            : 'text-slate-900'
+                            ? 'line-through text-[#737373]'
+                            : 'text-[#0A0A0A]'
                         }`}
                       >
                         {task.title}
                       </div>
 
-                      <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                      <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono-swiss">
                         <span
-                          className={`px-2 py-0.5 rounded-md border font-bold ${pri.cls}`}
+                          className={`px-2 py-0.5 border font-bold ${pri.cls}`}
                         >
                           {pri.label}
                         </span>
                         {task.planned_date && (
-                          <span className="text-slate-500 font-medium">
-                            计划：{task.planned_date}
+                          <span className="text-[#525252] font-bold">
+                            PLAN: {task.planned_date}
                           </span>
                         )}
                         {task.due_date && (
                           <span
                             className={
                               overdue
-                                ? 'text-red-700 font-bold'
-                                : 'text-slate-500 font-medium'
+                                ? 'text-[#E61919] font-black'
+                                : 'text-[#525252] font-bold'
                             }
                           >
-                            截止：{task.due_date}
+                            DUE: {task.due_date}
                           </span>
                         )}
                         {overdue && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-600 text-white font-bold">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-[#E61919] text-white font-bold">
                             <AlertTriangle
                               className="w-3 h-3"
                               aria-hidden="true"
                             />
-                            已逾期
+                            OVERDUE
                           </span>
                         )}
                       </div>
@@ -408,7 +411,7 @@ export const ProjectDetailPage: React.FC = () => {
                           status: e.target.value as TaskStatus,
                         })
                       }
-                      className="min-h-[36px] text-xs font-bold rounded-xl border border-slate-200 bg-slate-50 px-2.5 py-1 text-slate-700 cursor-pointer"
+                      className="min-h-[36px] text-xs font-mono-swiss font-bold border border-[#0A0A0A] bg-[#F6F5F2] px-2.5 py-1 text-[#0A0A0A] cursor-pointer"
                     >
                       <option value="todo">待办 (todo)</option>
                       <option value="doing">进行中 (doing)</option>
@@ -418,7 +421,7 @@ export const ProjectDetailPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => deleteTask(task.id)}
-                      className="min-w-[36px] min-h-[36px] flex items-center justify-center rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 cursor-pointer transition-colors"
+                      className="min-w-[36px] min-h-[36px] flex items-center justify-center border border-[#0A0A0A] bg-white text-[#0A0A0A] hover:bg-[#E61919] hover:text-white cursor-pointer transition-colors"
                       title="删除任务"
                       aria-label={`删除任务 ${task.title}`}
                     >

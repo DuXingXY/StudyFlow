@@ -16,22 +16,22 @@ import { calculateProjectProgress } from '../utils/dateUtils';
 
 const statusMeta: Record<
   GoalStatus,
-  { label: string; badgeClass: string; stripClass: string }
+  { label: string; code: string; badgeClass: string }
 > = {
   active: {
     label: '进行中',
-    badgeClass: 'bg-teal-50 text-teal-800 border-teal-200',
-    stripClass: 'bg-teal-600',
+    code: 'ACTIVE',
+    badgeClass: 'bg-[#0A0A0A] text-white border-[#0A0A0A]',
   },
   completed: {
     label: '已完成',
-    badgeClass: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    stripClass: 'bg-emerald-500',
+    code: 'DONE',
+    badgeClass: 'bg-white text-[#0A0A0A] border-[#0A0A0A]',
   },
   paused: {
     label: '已暂停',
-    badgeClass: 'bg-amber-50 text-amber-800 border-amber-200',
-    stripClass: 'bg-amber-500',
+    code: 'PAUSED',
+    badgeClass: 'bg-[#F6F5F2] text-[#525252] border-[#0A0A0A]',
   },
 };
 
@@ -119,46 +119,49 @@ export const GoalsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Page Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-teal-700 text-white flex items-center justify-center shadow-xs shrink-0">
-              <Target className="w-5 h-5" aria-hidden="true" />
-            </div>
-            <span>学习目标管理 (Goals)</span>
+      {/* Swiss Section Header */}
+      <div className="bg-white border-2 border-[#0A0A0A] p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-1">
+          <div className="font-mono-swiss text-xs font-bold text-[#E61919]">
+            02 // LONG-TERM OBJECTIVES (AC-02)
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-black tracking-tight uppercase">
+            学习目标管理 / GOALS
           </h1>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            确立中长期职业转型、程序设计竞赛或专业课学习方向，并通过具体项目拆解落地（AC-02）。
+          <p className="text-xs sm:text-sm text-[#525252] font-medium">
+            确立中长期职业发展、程序设计竞赛或专业课学习方向，并通过具体项目拆解落地。
           </p>
         </div>
 
         <button
           type="button"
           onClick={openCreateModal}
-          className="min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-orange-600 hover:bg-orange-700 text-white text-sm font-bold shadow-sm transition-all cursor-pointer shrink-0"
+          className="min-h-[44px] swiss-btn-accent px-5 py-2.5 text-xs sm:text-sm inline-flex items-center justify-center gap-2 shrink-0"
         >
           <Plus className="w-4 h-4" aria-hidden="true" />
-          <span>新建学习目标</span>
+          <span>新建学习目标 / NEW GOAL</span>
         </button>
       </div>
 
-      {/* Segmented Filter Bar */}
-      <div className="bento-card p-2 flex flex-wrap items-center gap-2">
+      {/* Swiss Segmented Filter Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 bg-white border-2 border-[#0A0A0A] divide-y sm:divide-y-0 divide-x divide-[#0A0A0A]">
         {(
           [
-            { key: 'all', label: `全部目标 (${goals.length})` },
+            { key: 'all', label: '全部目标', count: goals.length },
             {
               key: 'active',
-              label: `进行中 (${goals.filter((g) => g.status === 'active').length})`,
+              label: '进行中',
+              count: goals.filter((g) => g.status === 'active').length,
             },
             {
               key: 'completed',
-              label: `已完成 (${goals.filter((g) => g.status === 'completed').length})`,
+              label: '已完成',
+              count: goals.filter((g) => g.status === 'completed').length,
             },
             {
               key: 'paused',
-              label: `已暂停 (${goals.filter((g) => g.status === 'paused').length})`,
+              label: '已暂停',
+              count: goals.filter((g) => g.status === 'paused').length,
             },
           ] as const
         ).map((tab) => (
@@ -166,80 +169,74 @@ export const GoalsPage: React.FC = () => {
             key={tab.key}
             type="button"
             onClick={() => setStatusFilter(tab.key)}
-            className={`min-h-[38px] px-4 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+            className={`min-h-[44px] px-4 py-2.5 flex items-center justify-between text-xs font-extrabold cursor-pointer transition-colors ${
               statusFilter === tab.key
-                ? 'bg-teal-700 text-white shadow-xs'
-                : 'text-slate-600 hover:bg-teal-50/80 hover:text-teal-900'
+                ? 'bg-[#0A0A0A] text-white'
+                : 'bg-white text-[#0A0A0A] hover:bg-[#F6F5F2]'
             }`}
           >
-            {tab.label}
+            <span>{tab.label}</span>
+            <span className="font-mono-swiss">[{tab.count}]</span>
           </button>
         ))}
       </div>
 
-      {/* Bento Goals Cards */}
+      {/* Goals List */}
       {filteredGoals.length === 0 ? (
-        <div className="bento-card p-12 text-center space-y-3">
-          <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-700 flex items-center justify-center mx-auto">
-            <Target className="w-6 h-6" aria-hidden="true" />
-          </div>
-          <div className="text-base font-extrabold text-slate-900">
+        <div className="bg-white border-2 border-[#0A0A0A] p-12 text-center space-y-4">
+          <Target className="w-8 h-8 mx-auto text-[#0A0A0A]" aria-hidden="true" />
+          <div className="text-base font-black uppercase">
             当前筛选下暂无学习目标
           </div>
-          <p className="text-xs text-slate-500 max-w-md mx-auto">
+          <p className="text-xs text-[#525252] max-w-md mx-auto">
             建议先设立一个明确的阶段性目标（例如“冲刺程序设计竞赛省赛”或“完成软件开发工程师转型项目”），再围绕目标建立具体项目。
           </p>
           <button
             type="button"
             onClick={openCreateModal}
-            className="min-h-[42px] inline-flex items-center gap-1.5 px-5 py-2 rounded-xl bg-teal-700 text-white text-xs font-bold hover:bg-teal-800 cursor-pointer"
+            className="min-h-[42px] swiss-btn-primary px-5 py-2 text-xs inline-flex items-center gap-1.5"
           >
             <Plus className="w-4 h-4" aria-hidden="true" />
             立即创建第一个目标
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4">
-          {filteredGoals.map((goal) => {
+        <div className="space-y-4">
+          {filteredGoals.map((goal, idx) => {
             const linkedProjects = projects.filter((p) => p.goal_id === goal.id);
             const meta = statusMeta[goal.status];
 
             return (
               <div
                 key={goal.id}
-                className="bento-card bento-card-interactive relative overflow-hidden p-5 sm:p-6 space-y-4"
+                className="bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A]"
               >
-                {/* Left Colored Accent Strip */}
-                <div
-                  className={`absolute left-0 top-0 bottom-0 w-1.5 ${meta.stripClass}`}
-                  aria-hidden="true"
-                />
-
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pl-2">
+                {/* Goal Header Row */}
+                <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                   <div className="space-y-2 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2 font-mono-swiss text-xs">
+                      <span className="font-extrabold text-[#E61919]">
+                        GOAL.{String(idx + 1).padStart(2, '0')}
+                      </span>
                       <span
-                        className={`px-3 py-0.5 rounded-full text-xs font-bold border ${meta.badgeClass}`}
+                        className={`px-2 py-0.5 border font-bold ${meta.badgeClass}`}
                       >
-                        {meta.label}
+                        {meta.label} // {meta.code}
                       </span>
                       {goal.target_date && (
-                        <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 bg-slate-100 px-3 py-0.5 rounded-full">
-                          <Calendar
-                            className="w-3.5 h-3.5 text-teal-700"
-                            aria-hidden="true"
-                          />
-                          期望达成：{goal.target_date}
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 border border-[#0A0A0A] bg-[#F6F5F2] font-bold">
+                          <Calendar className="w-3.5 h-3.5" aria-hidden="true" />
+                          TARGET: {goal.target_date}
                         </span>
                       )}
                     </div>
 
-                    <h2 className="text-base sm:text-lg font-extrabold text-slate-900 break-words">
+                    <h2 className="text-lg sm:text-xl font-black text-[#0A0A0A] break-words">
                       {goal.title}
                     </h2>
 
                     {goal.description && (
-                      <p className="text-xs sm:text-sm text-slate-600 leading-relaxed break-words">
+                      <p className="text-xs sm:text-sm text-[#525252] leading-relaxed break-words">
                         {goal.description}
                       </p>
                     )}
@@ -255,7 +252,7 @@ export const GoalsPage: React.FC = () => {
                           status: e.target.value as GoalStatus,
                         })
                       }
-                      className="min-h-[38px] text-xs font-bold rounded-xl border border-slate-300 bg-slate-50 px-3 py-1.5 text-slate-700 cursor-pointer"
+                      className="min-h-[38px] font-mono-swiss text-xs font-bold border border-[#0A0A0A] bg-[#F6F5F2] px-3 py-1.5 cursor-pointer"
                     >
                       <option value="active">状态：进行中</option>
                       <option value="completed">状态：已完成</option>
@@ -265,7 +262,7 @@ export const GoalsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => openEditModal(goal)}
-                      className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-xs font-bold text-slate-700 cursor-pointer transition-colors"
+                      className="min-h-[38px] swiss-btn-outline px-3 py-1.5 text-xs inline-flex items-center gap-1"
                     >
                       <Edit3 className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>编辑</span>
@@ -274,7 +271,7 @@ export const GoalsPage: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleDelete(goal)}
-                      className="min-h-[38px] inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-red-200 hover:bg-red-50 text-xs font-bold text-red-600 cursor-pointer transition-colors"
+                      className="min-h-[38px] px-3 py-1.5 border border-[#0A0A0A] bg-white hover:bg-[#E61919] hover:text-white text-xs font-bold inline-flex items-center gap-1 cursor-pointer transition-colors"
                     >
                       <Trash2 className="w-3.5 h-3.5" aria-hidden="true" />
                       <span>删除</span>
@@ -282,26 +279,23 @@ export const GoalsPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Linked Projects Sub-Bento Grid */}
-                <div className="pt-4 border-t border-slate-100 pl-2">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-xs font-extrabold text-slate-700 flex items-center gap-1.5">
-                      <FolderKanban
-                        className="w-4 h-4 text-teal-700"
-                        aria-hidden="true"
-                      />
-                      支撑此目标的关联项目 ({linkedProjects.length})
+                {/* Linked Projects Sub-Grid */}
+                <div className="border-t-2 border-[#0A0A0A] bg-[#F6F5F2] p-4 sm:px-6 space-y-3">
+                  <div className="flex items-center justify-between font-mono-swiss text-xs">
+                    <span className="font-bold flex items-center gap-1.5">
+                      <FolderKanban className="w-3.5 h-3.5" aria-hidden="true" />
+                      LINKED PROJECTS [{linkedProjects.length}]
                     </span>
                     <Link
                       to="/projects"
-                      className="text-xs font-bold text-teal-700 hover:text-teal-900"
+                      className="font-bold underline hover:text-[#E61919]"
                     >
-                      前往项目中心 →
+                      MANAGE PROJECTS →
                     </Link>
                   </div>
 
                   {linkedProjects.length === 0 ? (
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-[#525252]">
                       暂未关联具体项目，可在“我的项目”中新建项目并绑定到此目标。
                     </p>
                   ) : (
@@ -315,28 +309,18 @@ export const GoalsPage: React.FC = () => {
                           <Link
                             key={proj.id}
                             to={`/projects/${proj.id}`}
-                            className="p-3.5 rounded-2xl bg-slate-50/80 hover:bg-teal-50/60 border border-slate-200/80 hover:border-teal-300 transition-all space-y-2 group"
+                            className="p-3 bg-white border border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white transition-colors flex items-center justify-between gap-2 group"
                           >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-xs font-bold text-slate-900 group-hover:text-teal-900 truncate flex items-center gap-1">
-                                <span className="truncate">{proj.name}</span>
-                                <ArrowUpRight
-                                  className="w-3.5 h-3.5 text-slate-400 group-hover:text-teal-700 shrink-0"
-                                  aria-hidden="true"
-                                />
-                              </span>
-                              <span className="text-xs font-extrabold text-teal-700 shrink-0">
-                                {progress.label}
-                              </span>
-                            </div>
-                            <div className="w-full h-1.5 rounded-full bg-slate-200 overflow-hidden">
-                              <div
-                                className="h-full rounded-full bg-teal-600 transition-all duration-300"
-                                style={{
-                                  width: `${progress.percentage ?? 0}%`,
-                                }}
+                            <span className="text-xs font-extrabold truncate flex items-center gap-1">
+                              <span className="truncate">{proj.name}</span>
+                              <ArrowUpRight
+                                className="w-3.5 h-3.5 shrink-0"
+                                aria-hidden="true"
                               />
-                            </div>
+                            </span>
+                            <span className="font-mono-swiss text-xs font-black text-[#E61919] group-hover:text-white shrink-0">
+                              {progress.label}
+                            </span>
                           </Link>
                         );
                       })}
@@ -351,35 +335,35 @@ export const GoalsPage: React.FC = () => {
 
       {/* Create / Edit Modal */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/55 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl border border-teal-200 shadow-2xl w-full max-w-lg p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-extrabold text-slate-900">
-                {editingGoal ? '编辑学习目标' : '新建学习目标'}
+        <div className="fixed inset-0 z-50 bg-[#0A0A0A]/70 flex items-center justify-center p-4">
+          <div className="bg-white border-2 border-[#0A0A0A] shadow-[8px_8px_0px_#0A0A0A] w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 bg-[#0A0A0A] text-white flex items-center justify-between">
+              <h3 className="font-mono-swiss text-sm font-bold uppercase">
+                {editingGoal ? 'EDIT GOAL // 编辑学习目标' : 'NEW GOAL // 新建学习目标'}
               </h3>
               <button
                 type="button"
                 onClick={() => setModalOpen(false)}
-                className="min-w-[38px] min-h-[38px] flex items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 hover:text-slate-600 cursor-pointer"
+                className="min-w-[32px] min-h-[32px] flex items-center justify-center border border-white/40 hover:bg-[#E61919] cursor-pointer"
                 aria-label="关闭弹窗"
               >
-                <X className="w-5 h-5" aria-hidden="true" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 
-            {formError && (
-              <div
-                role="alert"
-                className="p-3.5 rounded-xl bg-red-50 border border-red-200 text-xs text-red-700 font-bold"
-              >
-                {formError}
-              </div>
-            )}
+            <form onSubmit={handleSave} className="p-6 space-y-4" noValidate>
+              {formError && (
+                <div
+                  role="alert"
+                  className="p-3 bg-[#E61919] text-white text-xs font-bold"
+                >
+                  {formError}
+                </div>
+              )}
 
-            <form onSubmit={handleSave} className="space-y-4" noValidate>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  目标名称 <span className="text-red-600">*</span>
+                <label className="block font-mono-swiss text-xs font-bold uppercase mb-1.5">
+                  GOAL TITLE / 目标名称 <span className="text-[#E61919]">*</span>
                 </label>
                 <input
                   type="text"
@@ -387,66 +371,66 @@ export const GoalsPage: React.FC = () => {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="例如：备战蓝桥杯省赛 / 完成 Web 全栈项目交付"
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm border border-[#0A0A0A] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                  目标详细描述（选填）
+                <label className="block font-mono-swiss text-xs font-bold uppercase mb-1.5">
+                  DESCRIPTION / 目标说明（选填）
                 </label>
                 <textarea
                   rows={3}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="说明为什么要制定这个目标，以及如何衡量目标达成..."
-                  className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
+                  className="w-full px-3.5 py-2.5 text-sm border border-[#0A0A0A] focus:outline-none"
                 />
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    期望达成日期（选填）
+                  <label className="block font-mono-swiss text-xs font-bold uppercase mb-1.5">
+                    TARGET DATE / 期望达成日
                   </label>
                   <input
                     type="date"
                     value={targetDate}
                     onChange={(e) => setTargetDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 focus:border-teal-600 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 text-sm font-mono-swiss border border-[#0A0A0A]"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                    当前状态
+                  <label className="block font-mono-swiss text-xs font-bold uppercase mb-1.5">
+                    STATUS / 当前状态
                   </label>
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value as GoalStatus)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-slate-300 bg-white focus:border-teal-600 focus:outline-none"
+                    className="w-full px-3.5 py-2.5 text-sm font-bold border border-[#0A0A0A] bg-white"
                   >
-                    <option value="active">进行中 (active)</option>
-                    <option value="completed">已完成 (completed)</option>
-                    <option value="paused">已暂停 (paused)</option>
+                    <option value="active">进行中 (ACTIVE)</option>
+                    <option value="completed">已完成 (COMPLETED)</option>
+                    <option value="paused">已暂停 (PAUSED)</option>
                   </select>
                 </div>
               </div>
 
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-[#0A0A0A]">
                 <button
                   type="button"
                   onClick={() => setModalOpen(false)}
-                  className="min-h-[42px] px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-100 cursor-pointer"
+                  className="min-h-[42px] swiss-btn-outline px-4 py-2 text-xs"
                 >
-                  取消
+                  取消 / CANCEL
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="min-h-[42px] px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 disabled:opacity-50 text-xs font-bold text-white cursor-pointer"
+                  className="min-h-[42px] swiss-btn-accent px-5 py-2 text-xs"
                 >
-                  {submitting ? '保存中...' : '保存目标'}
+                  {submitting ? '保存中...' : '保存目标 / SAVE'}
                 </button>
               </div>
             </form>
