@@ -42,20 +42,36 @@
 ## 4. 快速启动与运行指南（对应 `AC-13`）
 
 ### 4.1 环境要求
-- Node.js `>= 22`（推荐 `24 LTS`；锁文件中的 Supabase 客户端要求 Node.js 22 或以上）
+
+- Windows、macOS 或 Linux。
+- Node.js `>= 22`（推荐 `24 LTS`；锁文件中的 Supabase 客户端要求 Node.js 22 或以上），以及随 Node.js 安装的 npm。
+- Git（使用下方克隆方式时需要）。
+
+可先在终端执行 `node --version`、`npm --version` 和 `git --version` 确认环境。首次下载源码和安装依赖需要联网。
 
 ### 4.2 安装与本地启动
-```bash
-# 1. 进入项目目录
-cd d:\Codex\StudyFlow
 
-# 2. 安装依赖（若已安装可跳过）
-npm install
+在你希望存放项目的目录打开终端，执行以下命令。Windows PowerShell、macOS 和 Linux 终端均可使用，无需创建特定盘符或目录。
+
+```bash
+# 1. 下载源码并进入项目目录
+git clone https://github.com/DuXingXY/StudyFlow.git
+cd StudyFlow
+
+# 2. 按仓库锁文件安装依赖，与 CI 保持一致
+npm ci
 
 # 3. 启动本地开发服务器
 npm run dev
 ```
-启动后在浏览器访问终端提示的地址（通常为 `http://localhost:5173`）。
+
+没有安装 Git 时，也可以在仓库页面选择 **Code → Download ZIP**，解压后在包含 `package.json` 的文件夹中打开终端，从 `npm ci` 开始执行。
+
+启动后保持终端运行，在浏览器访问终端输出的 **Local** 地址，通常为 `http://localhost:5173`。端口被占用时 Vite 会尝试其他端口，请以实际输出为准；按 `Ctrl+C` 可停止服务器。
+
+**首次体验无需创建 `.env`、配置 Supabase 或注册账号。** 在登录页点击 **“一键进入：竞赛生主账号 (User A)”** 即可查看预置目标、项目、任务和周复盘；进入 StudyFlow 项目可看到 `3/5 = 60%` 的初始进度。也可使用隔离测试账号 User B 对比两位用户的数据。
+
+默认模式将数据保存在当前浏览器、当前访问地址的 LocalStorage 中；刷新后保留，更换浏览器、设备或访问端口不会自动同步。侧边栏的 **“重置数据”** 会覆盖本地修改并恢复初始演示数据。
 
 ### 4.3 运行自动化验收测试与生产构建
 ```bash
@@ -64,16 +80,47 @@ npm test -- --run
 
 # 执行 TypeScript 类型检查与生产环境打包
 npm run build
+
+# 在本机预览刚生成的生产包（先完成上面的构建）
+npm run preview
 ```
+
+生产包生成在 `dist/` 中；预览时访问终端输出的地址。`npm run preview` 用于本机检查构建结果。
 
 GitHub Actions 在每次推送、Pull Request 或手动触发时，使用 Node.js 24 依次执行 `npm ci`、`npm test -- --run` 与 `npm run build`。流程见 [`.github/workflows/ci.yml`](./.github/workflows/ci.yml)，运行结果见 [GitHub Actions](https://github.com/DuXingXY/StudyFlow/actions)。
 
 现有自动化测试覆盖本地数据层的认证、目标与项目关联、删除保护、逾期与进度计算、周复盘防重、用户隔离和空输入校验；浏览器路由、刷新持久化、390px 移动端交互及真实 Supabase RLS 仍需按 [`docs/05-ACCEPTANCE.md`](./docs/05-ACCEPTANCE.md) 的对应步骤验收。
 
 ### 4.4 （可选）连接真实 Supabase 云端数据库
+
+需要使用云端账号与数据库时，再进行以下配置；默认本地演示可跳过本节。
+
 1. 在 Supabase 控制台新建项目，打开 SQL Editor 执行 [`supabase/migrations/001_init_studyflow.sql`](./supabase/migrations/001_init_studyflow.sql)；
-2. 复制 `.env.example` 为 `.env`，填入你的 `VITE_SUPABASE_URL` 与 `VITE_SUPABASE_ANON_KEY`；
-3. 重启 `npm run dev`，系统左下角状态指示器将自动切换为 **`Supabase RLS 云端隔离`**。
+2. 在项目根目录复制 `.env.example` 为 `.env`，填入你自己的 `VITE_SUPABASE_URL` 与 `VITE_SUPABASE_ANON_KEY`。可在文件管理器中复制，或使用对应终端命令：
+
+   ```powershell
+   # Windows PowerShell
+   Copy-Item .env.example .env
+   ```
+
+   ```bash
+   # macOS / Linux
+   cp .env.example .env
+   ```
+
+3. 停止并重新运行 `npm run dev`。两个变量均填写后，应用自动使用 Supabase，侧边栏显示 `CLOUD RLS`；若使用生产包，修改环境变量后需要重新构建。
+4. 使用该 Supabase 项目的真实账号注册或登录。本地演示账号及其预置数据不会自动导入云端；一键演示入口仅在本地模式显示。
+
+### 4.5 常见启动问题
+
+| 现象 | 处理方式 |
+| :--- | :--- |
+| 提示找不到 `node`、`npm` 或 `git` | 确认对应程序已安装，关闭终端后重新打开，再检查版本。 |
+| 提示找不到 `package.json` | 切换到下载或解压得到的项目根目录；该目录应包含 `package.json`、`package-lock.json` 和 `src/`。 |
+| Node.js 版本不满足依赖要求 | 切换至 Node.js 24 LTS，停止开发服务器后重新执行 `npm ci`。 |
+| Windows 执行 `npm ci` 时提示原生模块 `EPERM` / 文件占用 | 先用 `Ctrl+C` 停止正在运行的本项目开发服务器或预览进程，再重试安装。 |
+| 浏览器无法打开 `localhost:5173` | 确认启动终端仍在运行，并使用终端实际输出的 Local 地址。 |
+| 想体验预置数据，但出现云端登录错误 | 检查是否配置过 Supabase 环境变量；清空 `.env` 中的两个配置值后重启，并确认终端或其他 `.env.*` 文件没有提供相同变量。 |
 
 ---
 
