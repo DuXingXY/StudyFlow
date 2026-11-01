@@ -1,55 +1,32 @@
 import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  AlertTriangle,
-  Calendar,
-  CheckCircle2,
-  CheckSquare,
-  Circle,
-  Clock,
-  Edit3,
-  FolderKanban,
-  Plus,
-  Search,
-  Trash2,
-  X,
-} from 'lucide-react';
+import { Edit3, Plus, Search, Trash2 } from 'lucide-react';
 import { useStudyFlow } from '../context/StudyFlowContext';
 import type { Task, TaskPriority, TaskStatus } from '../types/models';
+import { getLocalDateString, isTaskOverdue, isTaskTodayOrOverdue } from '../utils/dateUtils';
 import {
-  getLocalDateString,
-  isTaskOverdue,
-  isTaskTodayOrOverdue,
-} from '../utils/dateUtils';
+  Button,
+  EmptyState,
+  Field,
+  FormError,
+  MetaItem,
+  Modal,
+  ModalActions,
+  PageHeader,
+  Segmented,
+  TaskRow,
+  iconButtonClass,
+  iconButtonDangerClass,
+  inputClass,
+  priorityMeta,
+  selectClass,
+  selectSmClass,
+} from '../components/ui';
 
 type TaskViewFilter = 'all' | 'today' | 'overdue' | 'todo' | 'doing' | 'done';
 
-const priorityMeta: Record<
-  TaskPriority,
-  { label: string; code: string; badgeClass: string; weight: number }
-> = {
-  high: {
-    label: '高优先级',
-    code: 'P0-HIGH',
-    badgeClass: 'bg-[#E61919] text-white border-[#E61919]',
-    weight: 3,
-  },
-  medium: {
-    label: '中优先级',
-    code: 'P1-MED',
-    badgeClass: 'bg-[#0A0A0A] text-white border-[#0A0A0A]',
-    weight: 2,
-  },
-  low: {
-    label: '低优先级',
-    code: 'P2-LOW',
-    badgeClass: 'bg-[#F6F5F2] text-[#525252] border-[#0A0A0A]',
-    weight: 1,
-  },
-};
-
 export const TasksPage: React.FC = () => {
-  const { projects, tasks, createTask, updateTask, deleteTask } = useStudyFlow();
+  const { projects, tasks, createTask, updateTask, deleteTask, runAction } = useStudyFlow();
   const todayStr = getLocalDateString();
 
   const [viewFilter, setViewFilter] = useState<TaskViewFilter>('all');
@@ -69,68 +46,47 @@ export const TasksPage: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
 
   const filteredTasks = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
     return tasks
       .filter((t) => {
-        if (viewFilter === 'today' && !isTaskTodayOrOverdue(t, todayStr))
+        if (viewFilter === 'today' && !isTaskTodayOrOverdue(t, todayStr)) return false;
+        if (viewFilter === 'overdue' && !isTaskOverdue(t, todayStr)) return false;
+        if ((viewFilter === 'todo' || viewFilter === 'doing' || viewFilter === 'done') && t.status !== viewFilter)
           return false;
-        if (viewFilter === 'overdue' && !isTaskOverdue(t, todayStr))
-          return false;
-        if (
-          (viewFilter === 'todo' ||
-            viewFilter === 'doing' ||
-            viewFilter === 'done') &&
-          t.status !== viewFilter
-        ) {
-          return false;
-        }
         if (projectFilter === 'unlinked' && t.project_id !== null) return false;
-        if (
-          projectFilter !== 'all' &&
-          projectFilter !== 'unlinked' &&
-          t.project_id !== projectFilter
-        ) {
-          return false;
-        }
-        if (priorityFilter !== 'all' && t.priority !== priorityFilter)
-          return false;
-        if (
-          searchQuery.trim() &&
-          !t.title.toLowerCase().includes(searchQuery.trim().toLowerCase())
-        ) {
-          return false;
-        }
+        if (projectFilter !== 'all' && projectFilter !== 'unlinked' && t.project_id !== projectFilter) return false;
+        if (priorityFilter !== 'all' && t.priority !== priorityFilter) return false;
+        if (query && !t.title.toLowerCase().includes(query)) return false;
         return true;
       })
       .sort((a, b) => {
-        const aOver = isTaskOverdue(a, todayStr) ? 1 : 0;
-        const bOver = isTaskOverdue(b, todayStr) ? 1 : 0;
-        if (aOver !== bOver) return bOver - aOver;
+        const overdueDiff = Number(isTaskOverdue(b, todayStr)) - Number(isTaskOverdue(a, todayStr));
+        if (overdueDiff !== 0) return overdueDiff;
         if (a.status === 'done' && b.status !== 'done') return 1;
         if (a.status !== 'done' && b.status === 'done') return -1;
         return priorityMeta[b.priority].weight - priorityMeta[a.priority].weight;
       });
   }, [tasks, viewFilter, projectFilter, priorityFilter, searchQuery, todayStr]);
 
-  const openCreateModal = () => {
-    setEditingTask(null);
-    setTitle('');
-    setProjectId(projects[0]?.id ?? '');
-    setStatus('todo');
-    setPriority('medium');
-    setPlannedDate(todayStr);
-    setDueDate('');
-    setFormError(null);
-    setModalOpen(true);
-  };
+  const counts = useMemo(
+    () => ({
+      today: tasks.filter((t) => isTaskTodayOrOverdue(t, todayStr)).length,
+      overdue: tasks.filter((t) => isTaskOverdue(t, todayStr)).length,
+      todo: tasks.filter((t) => t.status === 'todo').length,
+      doing: tasks.filter((t) => t.status === 'doing').length,
+      done: tasks.filter((t) => t.status === 'done').length,
+    }),
+    [tasks, todayStr]
+  );
 
-  const openEditModal = (task: Task) => {
+  const openModal = (task: Task | null) => {
     setEditingTask(task);
-    setTitle(task.title);
-    setProjectId(task.project_id ?? '');
-    setStatus(task.status);
-    setPriority(task.priority);
-    setPlannedDate(task.planned_date ?? '');
-    setDueDate(task.due_date ?? '');
+    setTitle(task?.title ?? '');
+    setProjectId(task ? (task.project_id ?? '') : (projects[0]?.id ?? ''));
+    setStatus(task?.status ?? 'todo');
+    setPriority(task?.priority ?? 'medium');
+    setPlannedDate(task ? (task.planned_date ?? '') : todayStr);
+    setDueDate(task?.due_date ?? '');
     setFormError(null);
     setModalOpen(true);
   };
@@ -143,25 +99,19 @@ export const TasksPage: React.FC = () => {
       return;
     }
     setSubmitting(true);
+    const payload = {
+      title,
+      project_id: projectId || null,
+      status,
+      priority,
+      planned_date: plannedDate || null,
+      due_date: dueDate || null,
+    };
     try {
       if (editingTask) {
-        await updateTask(editingTask.id, {
-          title,
-          project_id: projectId || null,
-          status,
-          priority,
-          planned_date: plannedDate || null,
-          due_date: dueDate || null,
-        });
+        await updateTask(editingTask.id, payload);
       } else {
-        await createTask({
-          title,
-          project_id: projectId || null,
-          status,
-          priority,
-          planned_date: plannedDate || null,
-          due_date: dueDate || null,
-        });
+        await createTask(payload);
       }
       setModalOpen(false);
     } catch (err) {
@@ -171,458 +121,257 @@ export const TasksPage: React.FC = () => {
     }
   };
 
-  const overdueCount = tasks.filter((t) => isTaskOverdue(t, todayStr)).length;
+  const handleDelete = (task: Task) => {
+    if (!window.confirm(`确定删除任务“${task.title}”吗？删除后无法恢复。`)) return;
+    void runAction(() => deleteTask(task.id));
+  };
+
+  const filtersActive =
+    viewFilter !== 'all' || projectFilter !== 'all' || priorityFilter !== 'all' || searchQuery.trim() !== '';
 
   return (
-    <div className="space-y-6">
-      {/* Swiss Header */}
-      <div className="bg-white border-2 border-[#0A0A0A] p-6 shadow-[4px_4px_0px_#0A0A0A] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 text-[11px] font-mono-swiss font-bold uppercase tracking-[0.2em] text-[#E61919]">
-            <span>04 // TASK EXECUTION MATRIX</span>
-          </div>
-          <h1 className="text-xl sm:text-2xl font-black text-[#0A0A0A] mt-1 tracking-tight">
-            任务执行中心 (Tasks)
-          </h1>
-          <p className="text-xs sm:text-sm text-[#525252] mt-1 font-medium">
-            统一管理项目子任务与日常独立待办，记录计划日期与截止期，自动预警逾期任务（AC-04 / AC-05）。
-          </p>
-        </div>
-
-        <button
-          type="button"
-          onClick={openCreateModal}
-          className="swiss-btn-accent min-h-[44px] inline-flex items-center justify-center gap-2 px-5 py-2.5 text-xs font-bold uppercase tracking-wider cursor-pointer shrink-0"
-        >
-          <Plus className="w-4 h-4" aria-hidden="true" />
-          <span>新增任务</span>
-        </button>
-      </div>
-
-      {/* Multi-dimensional Swiss Filter Bar */}
-      <div className="bg-white border-2 border-[#0A0A0A] p-4 space-y-3.5">
-        {/* View Tabs */}
-        <div className="flex flex-wrap items-center gap-1.5">
-          {(
-            [
-              { key: 'all', label: `ALL / 全部 (${tasks.length})` },
-              {
-                key: 'today',
-                label: `TODAY / 今日与逾期 (${tasks.filter((t) => isTaskTodayOrOverdue(t, todayStr)).length})`,
-              },
-              {
-                key: 'overdue',
-                label: `OVERDUE / 已逾期 (${overdueCount})`,
-                danger: overdueCount > 0,
-              },
-              {
-                key: 'todo',
-                label: `TODO / 待办 (${tasks.filter((t) => t.status === 'todo').length})`,
-              },
-              {
-                key: 'doing',
-                label: `DOING / 进行中 (${tasks.filter((t) => t.status === 'doing').length})`,
-              },
-              {
-                key: 'done',
-                label: `DONE / 已完成 (${tasks.filter((t) => t.status === 'done').length})`,
-              },
-            ] as Array<{
-              key: TaskViewFilter;
-              label: string;
-              danger?: boolean;
-            }>
-          ).map((tab) => (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setViewFilter(tab.key)}
-              className={`min-h-[38px] px-3.5 py-1.5 text-xs font-mono-swiss font-bold border transition-colors cursor-pointer ${
-                viewFilter === tab.key
-                  ? tab.danger
-                    ? 'bg-[#E61919] text-white border-[#0A0A0A]'
-                    : 'bg-[#0A0A0A] text-white border-[#0A0A0A]'
-                  : tab.danger
-                  ? 'bg-[#FFF5F5] text-[#E61919] border-[#E61919] hover:bg-[#E61919] hover:text-white'
-                  : 'bg-[#F6F5F2] text-[#0A0A0A] border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Secondary Filters */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t-2 border-[#0A0A0A]">
-          <div className="relative">
-            <Search
-              className="w-4 h-4 text-[#0A0A0A] absolute left-3.5 top-1/2 -translate-y-1/2"
-              aria-hidden="true"
-            />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜索任务标题关键词..."
-              className="w-full pl-9 pr-3 py-2 text-xs font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
-            />
-          </div>
-
-          <select
-            aria-label="按所属项目筛选"
-            value={projectFilter}
-            onChange={(e) => setProjectFilter(e.target.value)}
-            className="w-full px-3 py-2 text-xs font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] text-[#0A0A0A] cursor-pointer focus:outline-none"
-          >
-            <option value="all">项目筛选：全部项目与独立任务</option>
-            <option value="unlinked">独立任务（未关联项目）</option>
-            {projects.map((p) => (
-              <option key={p.id} value={p.id}>
-                项目：{p.name}
-              </option>
-            ))}
-          </select>
-
-          <select
-            aria-label="按优先级筛选"
-            value={priorityFilter}
-            onChange={(e) =>
-              setPriorityFilter(e.target.value as 'all' | TaskPriority)
-            }
-            className="w-full px-3 py-2 text-xs font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] text-[#0A0A0A] cursor-pointer focus:outline-none"
-          >
-            <option value="all">优先级筛选：全部优先级</option>
-            <option value="high">仅看：高优先级 (high)</option>
-            <option value="medium">仅看：中优先级 (medium)</option>
-            <option value="low">仅看：低优先级 (low)</option>
-          </select>
-        </div>
-      </div>
-
-      {/* Tasks List */}
-      {filteredTasks.length === 0 ? (
-        <div className="bg-white border-2 border-[#0A0A0A] p-12 text-center space-y-3">
-          <div className="w-12 h-12 bg-[#0A0A0A] text-white flex items-center justify-center mx-auto">
-            <CheckSquare className="w-6 h-6" aria-hidden="true" />
-          </div>
-          <div className="text-base font-black text-[#0A0A0A]">
-            没有找到符合筛选条件的任务
-          </div>
-          <p className="text-xs text-[#525252] max-w-md mx-auto">
-            你可以调整上方筛选条件，或者直接创建一条新的学习任务。
-          </p>
-          <button
-            type="button"
-            onClick={openCreateModal}
-            className="swiss-btn-primary min-h-[42px] inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold cursor-pointer"
-          >
+    <div>
+      <PageHeader
+        index="04"
+        title="任务中心"
+        description="项目子任务与日常独立待办都在这里。记录计划日期与截止日期，逾期未完成的任务会标红（AC-04 / AC-05）。"
+        meta={
+          <>
+            <MetaItem label="全部">{tasks.length}</MetaItem>
+            <MetaItem label="进行中">{counts.doing}</MetaItem>
+            {counts.overdue > 0 && (
+              <span className="text-accent font-semibold tabular-nums">{counts.overdue} 项逾期</span>
+            )}
+          </>
+        }
+        actions={
+          <Button variant="accent" onClick={() => openModal(null)}>
             <Plus className="w-4 h-4" aria-hidden="true" />
             新增任务
-          </button>
+          </Button>
+        }
+      />
+
+      <Segmented
+        label="按状态查看任务"
+        value={viewFilter}
+        onChange={setViewFilter}
+        options={[
+          { key: 'all', label: '全部', count: tasks.length },
+          { key: 'today', label: '今日与逾期', count: counts.today },
+          { key: 'overdue', label: '已逾期', count: counts.overdue, alert: true },
+          { key: 'todo', label: '待办', count: counts.todo },
+          { key: 'doing', label: '进行中', count: counts.doing },
+          { key: 'done', label: '已完成', count: counts.done },
+        ]}
+      />
+
+      <div className="mt-4 grid grid-cols-1 sm:grid-cols-12 gap-3">
+        <div className="relative sm:col-span-6">
+          <Search className="w-4 h-4 text-muted absolute left-3 top-1/2 -translate-y-1/2" aria-hidden="true" />
+          <input
+            type="search"
+            aria-label="搜索任务标题"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="搜索任务标题"
+            className={`${inputClass} pl-9`}
+          />
         </div>
+        <select
+          aria-label="按所属项目筛选"
+          value={projectFilter}
+          onChange={(e) => setProjectFilter(e.target.value)}
+          className={`${selectClass} sm:col-span-3`}
+        >
+          <option value="all">全部项目</option>
+          <option value="unlinked">独立任务</option>
+          {projects.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name}
+            </option>
+          ))}
+        </select>
+        <select
+          aria-label="按优先级筛选"
+          value={priorityFilter}
+          onChange={(e) => setPriorityFilter(e.target.value as 'all' | TaskPriority)}
+          className={`${selectClass} sm:col-span-3`}
+        >
+          <option value="all">全部优先级</option>
+          <option value="high">高优先级</option>
+          <option value="medium">中优先级</option>
+          <option value="low">低优先级</option>
+        </select>
+      </div>
+
+      <p className="mt-8 mb-2 text-xs text-muted tabular-nums" aria-live="polite">
+        显示 {filteredTasks.length} / {tasks.length} 项
+      </p>
+
+      {filteredTasks.length === 0 ? (
+        <EmptyState
+          title={filtersActive ? '没有符合筛选条件的任务' : '还没有任务'}
+          description={filtersActive ? '调整上方筛选条件，或直接新建一条任务。' : '从一条具体、今天就能开始的任务写起。'}
+          action={
+            <Button variant="primary" onClick={() => openModal(null)}>
+              <Plus className="w-4 h-4" aria-hidden="true" />
+              新增任务
+            </Button>
+          }
+        />
       ) : (
-        <div className="bg-white border-2 border-[#0A0A0A] shadow-[4px_4px_0px_#0A0A0A] divide-y-2 divide-[#0A0A0A]">
+        <ul className="border-t-2 border-ink">
           {filteredTasks.map((task) => {
             const linkedProject = projects.find((p) => p.id === task.project_id);
-            const overdue = isTaskOverdue(task, todayStr);
-            const pri = priorityMeta[task.priority];
-
             return (
-              <div
+              <TaskRow
                 key={task.id}
-                className={`p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 transition-colors ${
-                  overdue
-                    ? 'bg-[#FFF5F5]'
-                    : task.status === 'done'
-                    ? 'bg-[#F6F5F2] opacity-75'
-                    : 'bg-white hover:bg-[#F6F5F2]'
-                }`}
-              >
-                <div className="flex items-start gap-3.5 min-w-0">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      updateTask(task.id, {
-                        status: task.status === 'done' ? 'todo' : 'done',
-                      })
-                    }
-                    className="mt-0.5 min-w-[30px] min-h-[30px] flex items-center justify-center text-[#0A0A0A] hover:text-[#E61919] shrink-0 cursor-pointer transition-colors"
-                    aria-label={`切换任务 ${task.title} 状态`}
-                  >
-                    {task.status === 'done' ? (
-                      <CheckCircle2
-                        className="w-5 h-5 text-[#15803D]"
-                        aria-hidden="true"
-                      />
-                    ) : task.status === 'doing' ? (
-                      <Clock
-                        className="w-5 h-5 text-[#0A0A0A]"
-                        aria-hidden="true"
-                      />
-                    ) : (
-                      <Circle className="w-5 h-5" aria-hidden="true" />
-                    )}
-                  </button>
-
-                  <div className="space-y-1.5 min-w-0">
-                    <div
-                      className={`text-sm sm:text-base font-black break-words ${
-                        task.status === 'done'
-                          ? 'line-through text-[#737373]'
-                          : 'text-[#0A0A0A]'
-                      }`}
+                task={task}
+                overdue={isTaskOverdue(task, todayStr)}
+                onToggle={() =>
+                  runAction(() => updateTask(task.id, { status: task.status === 'done' ? 'todo' : 'done' }))
+                }
+                context={
+                  linkedProject ? (
+                    <Link
+                      to={`/projects/${linkedProject.id}`}
+                      className="text-ink hover:text-accent truncate max-w-[16rem]"
                     >
-                      {task.title}
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-2 text-xs">
-                      <span
-                        className={`px-2 py-0.5 border text-[11px] font-mono-swiss font-bold ${pri.badgeClass}`}
-                      >
-                        {pri.code} · {pri.label}
-                      </span>
-
-                      {linkedProject ? (
-                        <Link
-                          to={`/projects/${linkedProject.id}`}
-                          className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#F6F5F2] text-[#0A0A0A] border border-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white text-[11px] font-bold max-w-[240px] truncate transition-colors"
-                        >
-                          <FolderKanban
-                            className="w-3 h-3 shrink-0"
-                            aria-hidden="true"
-                          />
-                          <span className="truncate">{linkedProject.name}</span>
-                        </Link>
-                      ) : (
-                        <span className="px-2.5 py-0.5 bg-[#F6F5F2] border border-[#D4D4D0] text-[#525252] text-[11px] font-mono-swiss font-bold">
-                          独立任务
-                        </span>
-                      )}
-
-                      {task.planned_date && (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-mono-swiss text-[#525252] font-bold">
-                          <Calendar className="w-3 h-3" aria-hidden="true" />
-                          PLAN: {task.planned_date}
-                        </span>
-                      )}
-
-                      {task.due_date && (
-                        <span
-                          className={`inline-flex items-center gap-1 text-[11px] font-mono-swiss ${
-                            overdue
-                              ? 'text-[#E61919] font-black'
-                              : 'text-[#525252] font-bold'
-                          }`}
-                        >
-                          <Calendar className="w-3 h-3" aria-hidden="true" />
-                          DUE: {task.due_date}
-                        </span>
-                      )}
-
-                      {overdue && (
-                        <span
-                          data-testid="overdue-badge"
-                          className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-[#E61919] text-white text-[11px] font-mono-swiss font-bold"
-                        >
-                          <AlertTriangle
-                            className="w-3 h-3"
-                            aria-hidden="true"
-                          />
-                          OVERDUE · 已逾期提醒
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Right Controls */}
-                <div className="flex items-center gap-2 self-end sm:self-center shrink-0">
-                  <select
-                    aria-label={`修改任务 ${task.title} 的状态`}
-                    value={task.status}
-                    onChange={(e) =>
-                      updateTask(task.id, {
-                        status: e.target.value as TaskStatus,
-                      })
-                    }
-                    className="min-h-[38px] text-xs font-mono-swiss font-bold border-2 border-[#0A0A0A] bg-[#F6F5F2] px-3 py-1.5 text-[#0A0A0A] cursor-pointer"
-                  >
-                    <option value="todo">待办</option>
-                    <option value="doing">进行中</option>
-                    <option value="done">已完成</option>
-                  </select>
-
-                  <button
-                    type="button"
-                    onClick={() => openEditModal(task)}
-                    className="min-w-[38px] min-h-[38px] flex items-center justify-center border border-[#0A0A0A] bg-white hover:bg-[#0A0A0A] hover:text-white text-[#0A0A0A] cursor-pointer transition-colors"
-                    title="编辑任务"
-                    aria-label={`编辑任务 ${task.title}`}
-                  >
-                    <Edit3 className="w-4 h-4" aria-hidden="true" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => deleteTask(task.id)}
-                    className="min-w-[38px] min-h-[38px] flex items-center justify-center border border-[#0A0A0A] bg-white hover:bg-[#E61919] hover:text-white text-[#0A0A0A] cursor-pointer transition-colors"
-                    title="删除任务"
-                    aria-label={`删除任务 ${task.title}`}
-                  >
-                    <Trash2 className="w-4 h-4" aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
+                      {linkedProject.name}
+                    </Link>
+                  ) : (
+                    <span>独立任务</span>
+                  )
+                }
+                actions={
+                  <>
+                    <select
+                      aria-label={`修改任务 ${task.title} 的状态`}
+                      value={task.status}
+                      onChange={(e) =>
+                        runAction(() => updateTask(task.id, { status: e.target.value as TaskStatus }))
+                      }
+                      className={`${selectSmClass} w-[6.5rem]`}
+                    >
+                      <option value="todo">待办</option>
+                      <option value="doing">进行中</option>
+                      <option value="done">已完成</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => openModal(task)}
+                      className={iconButtonClass}
+                      aria-label={`编辑任务 ${task.title}`}
+                      title="编辑任务"
+                    >
+                      <Edit3 className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(task)}
+                      className={iconButtonDangerClass}
+                      aria-label={`删除任务 ${task.title}`}
+                      title="删除任务"
+                    >
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
+                    </button>
+                  </>
+                }
+              />
             );
           })}
-        </div>
+        </ul>
       )}
 
-      {/* Create / Edit Task Modal */}
-      {modalOpen && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4">
-          <div className="bg-white border-2 border-[#0A0A0A] shadow-[8px_8px_0px_#0A0A0A] w-full max-w-lg p-6 sm:p-7 space-y-5 max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b-2 border-[#0A0A0A]">
-              <div>
-                <div className="text-[10px] font-mono-swiss font-bold uppercase tracking-widest text-[#E61919]">
-                  TASK SPECIFICATION
-                </div>
-                <h3 className="text-lg font-black text-[#0A0A0A]">
-                  {editingTask ? '编辑任务' : '新增学习/开发任务'}
-                </h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setModalOpen(false)}
-                className="min-w-[38px] min-h-[38px] flex items-center justify-center border border-[#0A0A0A] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-white cursor-pointer"
-                aria-label="关闭弹窗"
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        eyebrow={editingTask ? '编辑任务' : '新增任务'}
+        title={editingTask ? editingTask.title : '新增学习或开发任务'}
+      >
+        <form onSubmit={handleSave} className="space-y-4" noValidate>
+          <FormError message={formError} />
+          <Field label="任务标题" htmlFor="task-title" required>
+            <input
+              id="task-title"
+              type="text"
+              required
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="例如：完成线段树专题练习"
+              className={inputClass}
+            />
+          </Field>
+          <Field label="所属项目" htmlFor="task-project" hint="不选则为独立任务">
+            <select
+              id="task-project"
+              value={projectId}
+              onChange={(e) => setProjectId(e.target.value)}
+              className={selectClass}
+            >
+              <option value="">不关联项目</option>
+              {projects.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="状态" htmlFor="task-status">
+              <select
+                id="task-status"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as TaskStatus)}
+                className={selectClass}
               >
-                <X className="w-5 h-5" aria-hidden="true" />
-              </button>
-            </div>
-
-            {formError && (
-              <div
-                role="alert"
-                className="p-3.5 bg-[#E61919] text-white text-xs font-bold"
+                <option value="todo">待办</option>
+                <option value="doing">进行中</option>
+                <option value="done">已完成</option>
+              </select>
+            </Field>
+            <Field label="优先级" htmlFor="task-priority">
+              <select
+                id="task-priority"
+                value={priority}
+                onChange={(e) => setPriority(e.target.value as TaskPriority)}
+                className={selectClass}
               >
-                {formError}
-              </div>
-            )}
-
-            <form onSubmit={handleSave} className="space-y-4" noValidate>
-              <div>
-                <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
-                  任务标题 <span className="text-[#E61919]">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="例如：完成数据结构线段树专题练习 / 编写接口单元测试"
-                  className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
-                  所属项目（选填，支持独立任务）
-                </label>
-                <select
-                  value={projectId}
-                  onChange={(e) => setProjectId(e.target.value)}
-                  className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2] focus:bg-white focus:outline-none"
-                >
-                  <option value="">-- 不绑定项目（作为日常独立任务） --</option>
-                  {projects.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
-                    任务状态
-                  </label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value as TaskStatus)}
-                    className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2]"
-                  >
-                    <option value="todo">待办 (todo)</option>
-                    <option value="doing">进行中 (doing)</option>
-                    <option value="done">已完成 (done)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
-                    优先级
-                  </label>
-                  <select
-                    value={priority}
-                    onChange={(e) =>
-                      setPriority(e.target.value as TaskPriority)
-                    }
-                    className="w-full px-3.5 py-2.5 text-sm border-2 border-[#0A0A0A] bg-[#F6F5F2]"
-                  >
-                    <option value="high">高优先级 (high)</option>
-                    <option value="medium">中优先级 (medium)</option>
-                    <option value="low">低优先级 (low)</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
-                    计划执行日期 (planned_date)
-                  </label>
-                  <input
-                    type="date"
-                    value={plannedDate}
-                    onChange={(e) => setPlannedDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm font-mono-swiss border-2 border-[#0A0A0A] bg-[#F6F5F2]"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-mono-swiss font-bold uppercase text-[#0A0A0A] mb-1.5">
-                    截止日期 (due_date)
-                  </label>
-                  <input
-                    type="date"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm font-mono-swiss border-2 border-[#0A0A0A] bg-[#F6F5F2]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t-2 border-[#0A0A0A]">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="swiss-btn-outline min-h-[42px] px-4 py-2 text-xs font-bold cursor-pointer"
-                >
-                  取消
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="swiss-btn-accent min-h-[42px] px-5 py-2 disabled:opacity-50 text-xs font-bold cursor-pointer"
-                >
-                  {submitting ? '保存中...' : '保存任务'}
-                </button>
-              </div>
-            </form>
+                <option value="high">高优先级</option>
+                <option value="medium">中优先级</option>
+                <option value="low">低优先级</option>
+              </select>
+            </Field>
+            <Field label="计划执行日" htmlFor="task-planned">
+              <input
+                id="task-planned"
+                type="date"
+                value={plannedDate}
+                onChange={(e) => setPlannedDate(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
+            <Field label="截止日期" htmlFor="task-due">
+              <input
+                id="task-due"
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className={inputClass}
+              />
+            </Field>
           </div>
-        </div>
-      )}
+          <ModalActions>
+            <Button variant="ghost" onClick={() => setModalOpen(false)}>
+              取消
+            </Button>
+            <Button type="submit" variant="primary" disabled={submitting}>
+              {submitting ? '保存中…' : '保存任务'}
+            </Button>
+          </ModalActions>
+        </form>
+      </Modal>
     </div>
   );
 };

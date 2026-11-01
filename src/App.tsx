@@ -17,8 +17,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({
 
   if (authInitializing) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 text-sm">
-        正在验证登录会话...
+      <div className="min-h-screen flex items-center justify-center gap-3 bg-white text-muted text-sm">
+        <span className="w-3 h-3 bg-accent animate-pulse" aria-hidden="true" />
+        正在验证登录会话…
       </div>
     );
   }

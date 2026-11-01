@@ -30,6 +30,8 @@ interface StudyFlowContextValue {
   toast: ToastNotice | null;
   showToast: (type: ToastNotice['type'], message: string) => void;
   clearToast: () => void;
+  /** 执行不带表单的即时操作（勾选、删除、改状态），失败时以错误通知提示而不是静默失败 */
+  runAction: (action: () => Promise<unknown>) => Promise<void>;
   refreshAllData: () => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, displayName?: string) => Promise<void>;
@@ -75,6 +77,17 @@ export const StudyFlowProvider: React.FC<{ children: React.ReactNode }> = ({
   const clearToast = useCallback(() => {
     setToast(null);
   }, []);
+
+  const runAction = useCallback(
+    async (action: () => Promise<unknown>) => {
+      try {
+        await action();
+      } catch (err) {
+        showToast('error', err instanceof Error ? err.message : '操作失败，请重试');
+      }
+    },
+    [showToast]
+  );
 
   useEffect(() => {
     if (!toast) return;
@@ -260,6 +273,7 @@ export const StudyFlowProvider: React.FC<{ children: React.ReactNode }> = ({
         toast,
         showToast,
         clearToast,
+        runAction,
         refreshAllData: loadDataForCurrentUser,
         signIn,
         signUp,

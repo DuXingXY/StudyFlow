@@ -1,117 +1,72 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
-:root {
-  --swiss-bg: #F6F5F2;
-  --swiss-surface: #FFFFFF;
-  --swiss-ink: #0A0A0A;
-  --swiss-muted: #525252;
-  --swiss-border: #0A0A0A;
-  --swiss-border-subtle: #D4D4D0;
-  --swiss-red: #E61919;
+/*
+ * Swiss / International Typographic Style
+ * 白底、黑色排版、单一信号红；结构靠网格与水平线，不靠卡片阴影。
+ * 字体使用系统 Helvetica / Arial 栈，中文回落到苹方 / 微软雅黑，离线演示无需加载外部字体。
+ */
+@theme {
+  --font-sans: "Helvetica Neue", Helvetica, Arial, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+
+  --color-ink: #111111;
+  --color-muted: #6b6b6b;
+  --color-line: #e4e4e0;
+  --color-line-strong: #bdbdb8;
+  --color-canvas: #f4f4f1;
+  --color-accent: #e30613;
+  --color-accent-soft: #fdeceb;
 }
 
 @layer base {
-  *, *::before, *::after {
-    border-radius: 0px !important;
-  }
-
-  html, body {
+  html,
+  body {
     overflow-x: hidden;
     max-width: 100vw;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-    background-color: var(--swiss-bg);
-    color: var(--swiss-ink);
-    line-height: 1.45;
+    background-color: #ffffff;
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.5;
     -webkit-font-smoothing: antialiased;
   }
 
+  ::selection {
+    background-color: var(--color-accent);
+    color: #ffffff;
+  }
+
   *:focus-visible {
-    outline: 2px solid var(--swiss-red);
+    outline: 2px solid var(--color-accent);
     outline-offset: 2px;
+  }
+
+  input[type="date"] {
+    font-variant-numeric: tabular-nums;
   }
 }
 
-.font-mono-swiss {
-  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-variant-numeric: tabular-nums;
+/* 原生 select 去掉系统外观，换成细线箭头 */
+.sf-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23111111' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 32px;
 }
 
-.swiss-frame {
-  background-color: var(--swiss-surface);
-  border: 1px solid var(--swiss-ink);
+/* 横向滚动的分段筛选条，隐藏滚动条但保留滚动 */
+.sf-scroll-x {
+  scrollbar-width: none;
 }
 
-.swiss-frame-lift {
-  background-color: var(--swiss-surface);
-  border: 1px solid var(--swiss-ink);
-  box-shadow: 4px 4px 0px var(--swiss-ink);
-  transition: transform 150ms ease, box-shadow 150ms ease;
-}
-
-.swiss-frame-lift:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 6px 6px 0px var(--swiss-ink);
-}
-
-.swiss-btn-primary {
-  background-color: var(--swiss-ink);
-  color: #FFFFFF;
-  border: 1px solid var(--swiss-ink);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  transition: background-color 150ms ease, color 150ms ease;
-  cursor: pointer;
-}
-
-.swiss-btn-primary:hover {
-  background-color: var(--swiss-red);
-  border-color: var(--swiss-red);
-  color: #FFFFFF;
-}
-
-.swiss-btn-accent {
-  background-color: var(--swiss-red);
-  color: #FFFFFF;
-  border: 1px solid var(--swiss-ink);
-  box-shadow: 3px 3px 0px var(--swiss-ink);
-  font-weight: 700;
-  transition: background-color 150ms ease, transform 150ms ease, box-shadow 150ms ease;
-  cursor: pointer;
-}
-
-.swiss-btn-accent:hover {
-  background-color: var(--swiss-ink);
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0px var(--swiss-red);
-}
-
-.swiss-btn-outline {
-  background-color: var(--swiss-surface);
-  color: var(--swiss-ink);
-  border: 1px solid var(--swiss-ink);
-  font-weight: 600;
-  transition: background-color 150ms ease, color 150ms ease;
-  cursor: pointer;
-}
-
-.swiss-btn-outline:hover {
-  background-color: var(--swiss-ink);
-  color: #FFFFFF;
-}
-
-.swiss-stripe-bg {
-  background-image: repeating-linear-gradient(
-    -45deg,
-    #F6F5F2,
-    #F6F5F2 6px,
-    #EAE8E3 6px,
-    #EAE8E3 12px
-  );
+.sf-scroll-x::-webkit-scrollbar {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
+  *,
+  ::before,
+  ::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
